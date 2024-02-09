@@ -19,5 +19,6 @@ def visu():
     fig.show()
     
 
-visu()
-print("done")
+if __name__ == "__main__":
+	visu()
+	print("done")
