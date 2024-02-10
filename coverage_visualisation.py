@@ -6,13 +6,15 @@ import pandas as pd
 def visualise_coverage_2D(cities : list[tuple[str, float, float]] | pd.DataFrame,
                        satellites : list[tuple[float, float, float]],
                        power : float | list[float],
-                       threashold : float):
+                       threashold : float,
+                       show_names : bool = True):
     """
     @pre :
         cities : a list of tuples (name, longitude, latitude), or a pandas dataframe from a geonames_*.csv file
         satellites : a list of tuples (longitude, latitude, altitude)
         power : the power of the satellites in MW
         threashold : the minimum intensity needed to be convered
+        show_names : if the names of the cities are shown on the plot, set to `True` by default
     @post :
         a plot of the coverage of the satellites
     """
@@ -43,8 +45,10 @@ def visualise_coverage_2D(cities : list[tuple[str, float, float]] | pd.DataFrame
 
     city_locations = np.array([city[1:] for city in cities]).transpose()
     plt.scatter(city_locations[0], city_locations[1])
-    for name, x, y in cities:
-        plt.text(x, y, name)
+
+    if show_names:
+        for name, x, y in cities:
+            plt.text(x, y, name)
 
 
     if len(satellites) > 0:
@@ -58,6 +62,11 @@ if __name__ == "__main__":
     # visualise_coverage_2D([("Mons", 0, 0), ("LLN", -5.587, 9.58461)],
     #                    [(-2, 2, 10), (-5, 10, 10)], 10.0, 0.007)
 
-    data : pd.DataFrame = pd.read_csv("geonames_be_smol.csv", sep=";")
+    data_be_smol : pd.DataFrame = pd.read_csv("geonames_be_smol.csv", sep=";")
+
+    data_be_big : pd.DataFrame = pd.read_csv("geonames_be.csv", sep=";")
+
+    data_glob_big : pd.DataFrame = pd.read_csv("geonames_cleared.csv", sep=";")
     
-    visualise_coverage_2D(data, [(4, 50, 10)], 9.0, 0.007)
+    visualise_coverage_2D(data_be_smol, [(4, 50, 10)],
+                          power=9.0, threashold=0.007, show_names=True)
