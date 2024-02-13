@@ -6,14 +6,14 @@ import time
 import matplotlib.pyplot as plt
 
 def opti(matrix, R, nbr_sat):
-    couverture = cp.Variable(len(matrix), nonneg=True)
+    couverture = cp.Variable(len(matrix), boolean=True)
     sat_lat = cp.Variable(nbr_sat)
     sat_long = cp.Variable(nbr_sat)
 
     weight = matrix[:,0]
     lat = matrix[:,1]
     long = matrix[:,2]
-    dist = np.ones(len(matrix))
+    dist = np.random.randint(0,40,len(matrix))
 
     objective = cp.sum(couverture*weight)
     constraints = [dist - R <= (1-couverture)* 10**8]
@@ -27,6 +27,10 @@ def opti(matrix, R, nbr_sat):
     print("Solution:", solution)
     print("poinds:", np.sum(weight))
     print("percentage:", solution/np.sum(weight))
+    print("distance:", dist)
+    print("couverture:", couverture.value)
+    print("sat_lat:", sat_lat.value)
+    print("sat_long:", sat_long.value)
     return
 
 
@@ -39,7 +43,7 @@ if __name__ == "__main__":
     mat = df.to_numpy()
     print(mat)
 
-    rayon = 1
+    rayon = 20
     sat = 1
 
     opti(mat,rayon,sat)
