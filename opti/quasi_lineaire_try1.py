@@ -13,21 +13,35 @@ def opti(matrix, R, nbr_sat):
     weight = matrix[:,0]
     lat = matrix[:,1]
     long = matrix[:,2]
-    dist = np.random.randint(0,40,len(matrix))
+    constraints = []
+
+    # distance orthodromique
+    for j in range(nbr_sat):
+    # Coordonnées sphériques du satellite actuel
+        # satellite_coords = np.array([sat_lat[i], sat_long[i]])
+        for i in range(len(matrix)):
+            # constraints += [111.2*(sat_lat - lat[i]) + 111.2*(sat_long - long[i]) - R <= (1-couverture[i])* 10**15]
+            # constraints += [np.arccos(np.sin(np.radians(matrix[i,1])) * np.sin(np.radians(satellite_coords[0])) +
+            #                 np.cos(np.radians(matrix[i,1])) * np.cos(np.radians(satellite_coords[0])) *
+            #                 np.cos(np.radians(matrix[i,2] - satellite_coords[1]))) * 6371 - R <= (1-couverture[i])* 10**15 ]
+
+            # Calcul de la distance géodésique entre le satellite et le point de référence
+            delta_lat = cp.abs(lat[i] - sat_lat[j])
+            delta_lon = cp.abs(long[i] - sat_long[j])
+            constraints += [cp.sqrt(cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13 - R <= (1-couverture[i])* 10**15 ]
 
     objective = cp.sum(couverture*weight)
-    constraints = [dist - R <= (1-couverture)* 10**8]
-
+    
     problem = cp.Problem(cp.Maximize(objective), constraints) 
     start_time = time.time()
-    solution = problem.solve(solver=cp.SCIPY, scipy_options={"method": "highs"})
+    solution = problem.solve(solver="SCIP")
     end_time = time.time()
 
     print("Time to solve:", end_time - start_time)
     print("Solution:", solution)
     print("poinds:", np.sum(weight))
     print("percentage:", solution/np.sum(weight))
-    print("distance:", dist)
+    # print("distance:", dist)
     print("couverture:", couverture.value)
     print("sat_lat:", sat_lat.value)
     print("sat_long:", sat_long.value)
@@ -43,7 +57,7 @@ if __name__ == "__main__":
     mat = df.to_numpy()
     print(mat)
 
-    rayon = 20
+    rayon = 40
     sat = 1
 
     opti(mat,rayon,sat)
