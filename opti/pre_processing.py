@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.spatial import distance
 import math
 
 
@@ -38,9 +39,31 @@ def calc_grid(file: str, grid_size_X = 10, grid_size_Y = 10) -> np.ndarray:
 
 
 
-
-
     return cities, grid
+
+
+
+
+def calc_adj(cities, grid: np.ndarray, radius: float):
+    matrix_adj = np.empty(len(cities), dtype=list)
+
+    for i in range(len(cities)):
+        x_c = cities[i][0]
+        y_c = cities[i][1]
+        matrix_adj[i] = list()
+
+        for y in range(len(grid)):
+            for x in range(len(grid[0])):   
+
+
+                 if radius >= distance.euclidean((x_c, y_c), grid[y][x]):
+                    
+                    matrix_adj[i].append(y * len(grid) + x)
+                    # matrix_adj[y][x] = True
+
+                # if radius >= np.sqrt((x_c - grid[y][x][0]) ** 2 + (y_c - grid[y][x][1]) ** 2):
+
+    return matrix_adj
 
 
 
@@ -51,8 +74,6 @@ def calc_grid(file: str, grid_size_X = 10, grid_size_Y = 10) -> np.ndarray:
 if __name__ == "__main__":
 
     cities, grid = calc_grid("../geonames_be_smol.csv")
-
-    print(grid[0])
 
 
     for i in range(len(cities)):
@@ -69,8 +90,12 @@ if __name__ == "__main__":
 
 
     # print(grid)
+            
+    matrix_adj = calc_adj(cities=cities, grid=grid, radius=1)
+    print(matrix_adj)
+    
 
-    # plt.show()
+    plt.show()
 
 
     
