@@ -31,7 +31,7 @@ def visualise_coverage_2D(cities : list[tuple[str, float, float]] | pd.DataFrame
     plt.ylabel("latitude [°]")
 
     for i, (x, y, z) in enumerate(satellites):
-        critical_r = np.sqrt(power[i]/(4*np.pi*threashold))
+        critical_r = np.sqrt(power[i]/(4*np.pi*threashold))/1000 # en km
         if critical_r <= z:
             print(f"sattelite {i} doesn't cover anything")
             continue
@@ -41,7 +41,7 @@ def visualise_coverage_2D(cities : list[tuple[str, float, float]] | pd.DataFrame
         x_ = np.linspace(-critical_d, critical_d, 100)
         y_ = np.sqrt(-np.power(x_, 2)+critical_d*critical_d)
         y2 = -y_
-        plt.fill(x_+x, y_+y, "orange", x_+x, y2+y, "orange")
+        plt.fill((x_/111.2)+x, (y_/111.2)+y, "orange", (x_/111.2)+x, (y2/111.2)+y, "orange")
 
     city_locations = np.array([city[1:] for city in cities]).transpose()
     plt.scatter(city_locations[0], city_locations[1])
@@ -59,13 +59,10 @@ def visualise_coverage_2D(cities : list[tuple[str, float, float]] | pd.DataFrame
 
 
 if __name__ == "__main__":
-    # visualise_coverage_2D([("Mons", 0, 0), ("LLN", -5.587, 9.58461)],
-    #                    [(-2, 2, 10), (-5, 10, 10)], 10.0, 0.007)
-
     data_be_smol : pd.DataFrame = pd.read_csv("geonames_be_smol.csv", sep=";")
     data_be_big : pd.DataFrame = pd.read_csv("geonames_be.csv", sep=";")
     data_glob_big : pd.DataFrame = pd.read_csv("geonames_cleared.csv", sep=";")
     data_glob_smol : pd.DataFrame = pd.read_csv("geonames_smol.csv", sep=";")
     
-    visualise_coverage_2D(data_glob_smol, [(4, 50, 10)],
-                          power=9.0, threashold=0.007, show_names=False)
+    visualise_coverage_2D(data_be_smol, [(4, 50, 1000)],
+                          power=9.0e10, threashold=0.007, show_names=True)
