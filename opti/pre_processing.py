@@ -59,11 +59,20 @@ def calc_adj(cities, grid: np.ndarray, radius: float):
                  if radius >= distance.euclidean((x_c, y_c), grid[y][x]):
                     
                     matrix_adj[i].append(y * len(grid) + x)
-                    # matrix_adj[y][x] = True
 
-                # if radius >= np.sqrt((x_c - grid[y][x][0]) ** 2 + (y_c - grid[y][x][1]) ** 2):
 
     return matrix_adj
+
+
+
+
+def index_to_grid(index: int, grid_size_X: int, grid_size_Y: int) -> int:
+    """Return (col, row) of the grid"""
+    return index // grid_size_Y, index % grid_size_X
+
+def grid_to_index(col: int, row: int, grid_size_Y: int):
+    """Return the index from (col, row)"""
+    return col * grid_size_Y + row
 
 
 
@@ -92,10 +101,20 @@ if __name__ == "__main__":
     # print(grid)
             
     matrix_adj = calc_adj(cities=cities, grid=grid, radius=1)
-    print(matrix_adj)
+
+    c_nb = 10
+
+    plt.plot(cities[c_nb][0], cities[c_nb][1], "o", color="green")
+
+    for i in range(len(matrix_adj[c_nb])):
+        col, row = index_to_grid(matrix_adj[c_nb][i], 10, 10)
+  
+        plt.plot(grid[col][row][0], 
+                 grid[col][row][1],
+                 "o", color="yellow")
+
     
 
     plt.show()
-
 
     
