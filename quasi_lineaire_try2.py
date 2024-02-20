@@ -71,8 +71,8 @@ def opti(matrix, R, nbr_sat):
 
 
 if __name__ == "__main__":
-    # df = pd.read_csv("geonames_be_smol.csv",delimiter=";")
-    df = pd.read_csv("geonames_be.csv",delimiter=";")
+    df = pd.read_csv("geonames_be_smol.csv",delimiter=";")
+    # df = pd.read_csv("geonames_be.csv",delimiter=";")
     df["latitude"] = df["Coordinates"].str.split(",",expand=True)[0].astype(float)
     df["longitude"] = df["Coordinates"].str.split(",",expand=True)[1].astype(float)
     df.drop(columns=["Coordinates","Name","Country name EN","Elevation"],inplace=True)
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     mat = df.to_numpy()
     print(mat)
 
-    rayon = 100
-    sat = 3
+    rayon = 10
+    sat = 10
 
     opti(mat,rayon,sat)
