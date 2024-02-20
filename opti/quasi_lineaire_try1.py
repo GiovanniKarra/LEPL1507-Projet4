@@ -26,15 +26,15 @@ def opti(matrix, R, nbr_sat):
             #                 np.cos(np.radians(matrix[i,2] - satellite_coords[1]))) * 6371 - R <= (1-couverture[i])* 10**15 ]
 
             # Calcul de la distance géodésique entre le satellite et le point de référence
-            delta_lat = cp.abs(lat[i] - sat_lat[j])
-            delta_lon = cp.abs(long[i] - sat_long[j])
+            delta_lat = cp.abs(sat_lat[j] - lat[i])
+            delta_lon = cp.abs(sat_long[j] - long[i])
             constraints += [cp.sqrt(cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13 - R <= (1-couverture[i])* 10**15 ]
 
     objective = cp.sum(couverture*weight)
     
     problem = cp.Problem(cp.Maximize(objective), constraints) 
     start_time = time.time()
-    solution = problem.solve(solver="SCIP")
+    solution = problem.solve(solver="ECOS")
     end_time = time.time()
 
     print("Time to solve:", end_time - start_time)
