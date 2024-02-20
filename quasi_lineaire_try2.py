@@ -8,22 +8,33 @@ import matplotlib.pyplot as plt
 from coverage_visualisation import visualise_coverage_2D
 
 def opti(matrix, R, nbr_sat):
-    couverture = []
-    for i in range(nbr_sat):
-        cv = cp.Variable(len(matrix), boolean=True)
-        couverture.append(cv)
-
-    sat_lat = cp.Variable(nbr_sat)
-    sat_long = cp.Variable(nbr_sat)
+    
 
     weight = matrix[:,0]
     lat = matrix[:,1]
     long = matrix[:,2]
-    constraints = [sat_lat >= 0, sat_lat <= 90, sat_long >= 0, sat_long <= 180]
 
+    tot_sol = 0
+    tot_sat_lat = np.zeros(nbr_sat)
+    tot_sat_long = np.zeros(nbr_sat)
+    tot_couverture = []
+
+    start_time = time.time()
     # distance orthodromique
     for j in range(nbr_sat):
-    # Coordonnées sphériques du satellite actuel
+        couverture = cp.Variable(len(matrix), boolean=True)
+
+        sat_lat = cp.Variable(nbr_sat)
+        sat_long = cp.Variable(nbr_sat)
+        
+        constraints = [sat_lat >= 0, sat_lat <= 90, sat_long >= 0, sat_long <= 180]
+
+        if j > 0:
+
+            weight = weight - np.round(prev_couv) * weight
+
+        print(weight)
+        # Coordonnées sphériques du satellite actuel
         # satellite_coords = np.array([sat_lat[i], sat_long[i]])
         for i in range(len(matrix)):
             # constraints += [111.2*(sat_lat - lat[i]) + 111.2*(sat_long - long[i]) - R <= (1-couverture[i])* 10**15]
@@ -34,22 +45,26 @@ def opti(matrix, R, nbr_sat):
             # Calcul de la distance géodésique entre le satellite et le point de référence
             delta_lat = cp.abs(sat_lat[j] - lat[i])
             delta_lon = cp.abs(sat_long[j] - long[i])
-            constraints += [ (cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13**2 - R**2 <= (1-couverture[j][i]) * 10**6]
+            constraints += [ (cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13**2 - R**2 <= (1-couverture[i]) * 10**6]
 
-        objective = cp.sum(couverture[j]*weight)
-    
-    problem = cp.Problem(cp.Maximize(objective), constraints) 
-    start_time = time.time()
-    solution = problem.solve(solver="SCIP")
+        objective = cp.sum(couverture*weight)
+        problem = cp.Problem(cp.Maximize(objective), constraints) 
+        solution = problem.solve(solver="SCIP")
+        tot_sol += solution
+        tot_sat_lat[j] = sat_lat[0].value  
+        tot_sat_long[j] = sat_long[0].value
+        tot_couverture.append(couverture.value)
+        prev_couv = couverture.value
+
     end_time = time.time()
 
     print("Time to solve:", end_time - start_time)
-    print("Solution:", solution)
-    print("poinds:", np.sum(weight))
+    print("Solution:", tot_sol)
+    print("Total:", np.sum(matrix[:,0]))
     print("percentage:", solution/np.sum(weight))
-    print("couverture:", [couverture[i].value for i in range(nbr_sat)])
-    print("sat_lat:", sat_lat.value)
-    print("sat_long:", sat_long.value)
+    print("couverture:", tot_couverture)
+    print("sat_lat:", tot_sat_lat)
+    print("sat_long:", tot_sat_long)
 
     visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([sat_long.value, sat_lat.value, [1000]*nbr_sat]).T, (R**2+1000**2)*1000**2*4*3.14159, 1, show_names=False)
     return
@@ -66,6 +81,6 @@ if __name__ == "__main__":
     print(mat)
 
     rayon = 10
-    sat = 1
+    sat = 2
 
     opti(mat,rayon,sat)
