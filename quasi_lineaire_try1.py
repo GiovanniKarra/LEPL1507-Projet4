@@ -8,7 +8,11 @@ import matplotlib.pyplot as plt
 from coverage_visualisation import visualise_coverage_2D
 
 def opti(matrix, R, nbr_sat):
-    couverture = cp.Variable(len(matrix), boolean=True)
+    couverture = []
+    for i in range(nbr_sat):
+        cv = cp.Variable(len(matrix), boolean=True)
+        couverture.append(cv)
+
     sat_lat = cp.Variable(nbr_sat)
     sat_long = cp.Variable(nbr_sat)
 
@@ -30,9 +34,9 @@ def opti(matrix, R, nbr_sat):
             # Calcul de la distance géodésique entre le satellite et le point de référence
             delta_lat = cp.abs(sat_lat[j] - lat[i])
             delta_lon = cp.abs(sat_long[j] - long[i])
-            constraints += [ (cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13**2 - R**2 <= (1-couverture[i]) * 10**6]
+            constraints += [ (cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13**2 - R**2 <= (1-couverture[j][i]) * 10**6]
 
-    objective = cp.sum(couverture*weight)
+        objective = cp.sum(couverture[j]*weight)
     
     problem = cp.Problem(cp.Maximize(objective), constraints) 
     start_time = time.time()
@@ -43,18 +47,17 @@ def opti(matrix, R, nbr_sat):
     print("Solution:", solution)
     print("poinds:", np.sum(weight))
     print("percentage:", solution/np.sum(weight))
-    # print("distance:", dist)
-    print("couverture:", couverture.value)
+    print("couverture:", [couverture[i].value for i in range(nbr_sat)])
     print("sat_lat:", sat_lat.value)
     print("sat_long:", sat_long.value)
 
-    visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([sat_long.value, sat_lat.value, [1000]*nbr_sat]).T, R**2*1000**2*4*3.14159, 1, show_names=False)
+    visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([sat_long.value, sat_lat.value, [1000]*nbr_sat]).T, (R**2+1000**2)*1000**2*4*3.14159, 1, show_names=False)
     return
 
 
 if __name__ == "__main__":
     df = pd.read_csv("geonames_be_smol.csv",delimiter=";")
-    # df = pd.read_csv("geonames_smol.csv",delimiter=";")
+    df = pd.read_csv("geonames_be.csv",delimiter=";")
     df["latitude"] = df["Coordinates"].str.split(",",expand=True)[0].astype(float)
     df["longitude"] = df["Coordinates"].str.split(",",expand=True)[1].astype(float)
     df.drop(columns=["Coordinates","Name","Country name EN","Elevation"],inplace=True)
@@ -62,7 +65,7 @@ if __name__ == "__main__":
     mat = df.to_numpy()
     print(mat)
 
-    rayon = 100
+    rayon = 10
     sat = 1
 
     opti(mat,rayon,sat)
