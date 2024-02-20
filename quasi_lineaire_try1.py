@@ -5,6 +5,8 @@ import math
 import time
 import matplotlib.pyplot as plt
 
+from coverage_visualisation import visualise_coverage_2D
+
 def opti(matrix, R, nbr_sat):
     couverture = cp.Variable(len(matrix), boolean=True)
     sat_lat = cp.Variable(nbr_sat)
@@ -13,7 +15,7 @@ def opti(matrix, R, nbr_sat):
     weight = matrix[:,0]
     lat = matrix[:,1]
     long = matrix[:,2]
-    constraints = []
+    constraints = [sat_lat >= 0, sat_lat <= 90, sat_long >= 0, sat_long <= 180]
 
     # distance orthodromique
     for j in range(nbr_sat):
@@ -28,13 +30,13 @@ def opti(matrix, R, nbr_sat):
             # Calcul de la distance géodésique entre le satellite et le point de référence
             delta_lat = cp.abs(sat_lat[j] - lat[i])
             delta_lon = cp.abs(sat_long[j] - long[i])
-            constraints += [cp.sqrt(cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13 - R <= (1-couverture[i])* 10**15 ]
+            constraints += [ (cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13**2 - R**2 <= (1-couverture[i]) * 10**6]
 
     objective = cp.sum(couverture*weight)
     
     problem = cp.Problem(cp.Maximize(objective), constraints) 
     start_time = time.time()
-    solution = problem.solve(solver="ECOS")
+    solution = problem.solve(solver="SCIP")
     end_time = time.time()
 
     print("Time to solve:", end_time - start_time)
@@ -45,11 +47,14 @@ def opti(matrix, R, nbr_sat):
     print("couverture:", couverture.value)
     print("sat_lat:", sat_lat.value)
     print("sat_long:", sat_long.value)
+
+    visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([sat_long.value, sat_lat.value, [1000]*nbr_sat]).T, R**2*1000**2*4*3.14159, 1, show_names=False)
     return
 
 
 if __name__ == "__main__":
     df = pd.read_csv("geonames_be_smol.csv",delimiter=";")
+    # df = pd.read_csv("geonames_smol.csv",delimiter=";")
     df["latitude"] = df["Coordinates"].str.split(",",expand=True)[0].astype(float)
     df["longitude"] = df["Coordinates"].str.split(",",expand=True)[1].astype(float)
     df.drop(columns=["Coordinates","Name","Country name EN","Elevation"],inplace=True)
@@ -57,7 +62,7 @@ if __name__ == "__main__":
     mat = df.to_numpy()
     print(mat)
 
-    rayon = 40
+    rayon = 100
     sat = 1
 
     opti(mat,rayon,sat)
