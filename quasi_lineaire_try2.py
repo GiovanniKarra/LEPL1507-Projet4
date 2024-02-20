@@ -24,8 +24,8 @@ def opti(matrix, R, nbr_sat):
     for j in range(nbr_sat):
         couverture = cp.Variable(len(matrix), boolean=True)
 
-        sat_lat = cp.Variable(nbr_sat)
-        sat_long = cp.Variable(nbr_sat)
+        sat_lat = cp.Variable(1)
+        sat_long = cp.Variable(1)
         
         constraints = [sat_lat >= 0, sat_lat <= 90, sat_long >= 0, sat_long <= 180]
 
@@ -33,7 +33,6 @@ def opti(matrix, R, nbr_sat):
 
             weight = weight - np.round(prev_couv) * weight
 
-        print(weight)
         # Coordonnées sphériques du satellite actuel
         # satellite_coords = np.array([sat_lat[i], sat_long[i]])
         for i in range(len(matrix)):
@@ -43,8 +42,8 @@ def opti(matrix, R, nbr_sat):
             #                 np.cos(np.radians(matrix[i,2] - satellite_coords[1]))) * 6371 - R <= (1-couverture[i])* 10**15 ]
 
             # Calcul de la distance géodésique entre le satellite et le point de référence
-            delta_lat = cp.abs(sat_lat[j] - lat[i])
-            delta_lon = cp.abs(sat_long[j] - long[i])
+            delta_lat = cp.abs(sat_lat[0] - lat[i])
+            delta_lon = cp.abs(sat_long[0] - long[i])
             constraints += [ (cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13**2 - R**2 <= (1-couverture[i]) * 10**6]
 
         objective = cp.sum(couverture*weight)
@@ -55,24 +54,25 @@ def opti(matrix, R, nbr_sat):
         tot_sat_long[j] = sat_long[0].value
         tot_couverture.append(couverture.value)
         prev_couv = couverture.value
+        print("sat")
 
     end_time = time.time()
 
     print("Time to solve:", end_time - start_time)
     print("Solution:", tot_sol)
     print("Total:", np.sum(matrix[:,0]))
-    print("percentage:", solution/np.sum(weight))
+    print("percentage:", tot_sol/np.sum(matrix[:,0]))
     print("couverture:", tot_couverture)
     print("sat_lat:", tot_sat_lat)
     print("sat_long:", tot_sat_long)
 
-    visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([sat_long.value, sat_lat.value, [1000]*nbr_sat]).T, (R**2+1000**2)*1000**2*4*3.14159, 1, show_names=False)
+    visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([tot_sat_long, tot_sat_lat, [1000]*nbr_sat]).T, (R**2+1000**2)*1000**2*4*3.14159, 1, show_names=False)
     return
 
 
 if __name__ == "__main__":
-    df = pd.read_csv("geonames_be_smol.csv",delimiter=";")
-    # df = pd.read_csv("geonames_be.csv",delimiter=";")
+    # df = pd.read_csv("geonames_be_smol.csv",delimiter=";")
+    df = pd.read_csv("geonames_be.csv",delimiter=";")
     df["latitude"] = df["Coordinates"].str.split(",",expand=True)[0].astype(float)
     df["longitude"] = df["Coordinates"].str.split(",",expand=True)[1].astype(float)
     df.drop(columns=["Coordinates","Name","Country name EN","Elevation"],inplace=True)
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     mat = df.to_numpy()
     print(mat)
 
-    rayon = 10
-    sat = 2
+    rayon = 100
+    sat = 3
 
     opti(mat,rayon,sat)
