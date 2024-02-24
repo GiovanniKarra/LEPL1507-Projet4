@@ -32,14 +32,14 @@ def basemodel(N_sat, N_cities, N_grid, population, coverage):
     contraintes = []
 
     # N satellites
-    contraintes.append(cp.sum(x) == N_sat)
+    contraintes.append(cp.sum(x) <= N_sat)
     
     # Couverture
-    for j in range(N_cities    ):
+    for i in range(N_cities):
         vec_couverture = np.zeros(N_grid, dtype=bool)
-        vec_couverture[coverage[j]] = True
+        vec_couverture[coverage[i]] = True
         
-        contraintes.append(y[j] <= cp.sum(cp.multiply(x, vec_couverture)))
+        contraintes.append(y[i] <= cp.sum(cp.multiply(x, vec_couverture)))
 
     # Debug: voir si les contraintes respectent les DCP rules
     if verbose:
@@ -57,8 +57,8 @@ data_names = ["../geonames_be.csv"]   # <-- Mettre ici les noms des fichiers csv
 N_experiences = len(data_names)
 
 verbose = True
-N_sat = 4
-radius = 0.5
+N_sat = 6
+radius = 0.4
 grid_size_X = 30
 grid_size_Y = 30
 
@@ -74,13 +74,16 @@ for j in range(N_experiences):
     N_grid = len(grid) * len(grid[0])
 
     population = [cities[i][2] for i in range(len(cities))]
-    covered_adj = pre_processing.calc_adj(cities=cities, grid=grid, radius=radius)    
+
+    startpre = time.time()
+    covered_adj = pre_processing.calc_adj(cities=cities, grid=grid, radius=radius)  
+    endpre = time.time()  
 
     problem = basemodel(N_sat, N_cities, N_grid, population, covered_adj)
     
-    starttime = time.time()
+    startsolve = time.time()
     problem.solve(verbose=verbose, warm_start=True)
-    endtime = time.time()
+    endsolve = time.time()
 
     vars = problem.variables()
 
@@ -99,7 +102,7 @@ for j in range(N_experiences):
         #print("Couverture :", coverage)
         print("Statut : %s" % problem.status)
         print("Population couverte : %d (%f %%)" % (problem.value, problem.value / np.sum(population) * 100))
-        print("Temps d'exécution : %f sec (activer le mode verbose pour + de détails)" % (endtime - starttime))
+        print("Temps de solve : %f sec" % (endsolve - startsolve))
         #print("Variables x :", save_x[-1])
 
     for y in range(len(grid)):
@@ -108,7 +111,7 @@ for j in range(N_experiences):
 
 
     for i in range(len(cities)):
-        plt.plot(cities[i][0], cities[i][1], "o", color="blue")
+        plt.plot(cities[i][0], cities[i][1], "o", color="blue", alpha=0.6)
 
     
     sat_positions = np.array(save_x[-1])
@@ -116,6 +119,9 @@ for j in range(N_experiences):
     print("Positions satellites (id grid) :", indices_sat_positions)
     for i in indices_sat_positions:
         y,x = pre_processing.index_to_grid(i, len(grid), len(grid[0]))
-        plt.plot(grid[y][x][0], grid[y][x][1], "o", color="red")
+        plt.plot(grid[y][x][0], grid[y][x][1], "*", color="red", markersize=10)
+        circle = plt.Circle((grid[y][x][0], grid[y][x][1]), radius, color='r', fill=False, linestyle="--", zorder=2)
+        plt.gca().add_patch(circle)
+
 
     plt.show()
