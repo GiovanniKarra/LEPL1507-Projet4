@@ -4,6 +4,7 @@ import pandas as pd
 import math
 import time
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
 from coverage_visualisation import visualise_coverage_2D
 
@@ -28,7 +29,7 @@ def opti(matrix, R, nbr_sat):
         constraints = [sat_lat >= 0, sat_lat <= 90, sat_long >= 0, sat_long <= 180]
 
         if j > 0:
-
+            print("prev_couv", prev_couv)
             weight = weight - np.round(prev_couv) * weight
             print("weight", weight)
             lat = [lat[i] for i in range(len(lat)) if weight[i] != 0]
@@ -51,11 +52,12 @@ def opti(matrix, R, nbr_sat):
             # Calcul de la distance géodésique entre le satellite et le point de référence
             delta_lat = cp.abs(sat_lat[0] - lat[i])
             delta_lon = cp.abs(sat_long[0] - long[i])
-            constraints += [ (cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13**2 - R**2 <= (1-couverture[i]) * 10**6]
+            constraints += [ (cp.power(delta_lat,2) + cp.power(delta_lon,2)) * 111.13**2 - R**2 <= (1-couverture[i]) * 10**7]
 
         objective = cp.sum(couverture*weight)
         problem = cp.Problem(cp.Maximize(objective), constraints) 
         solution = problem.solve(solver="SCIP")
+        print("solution", solution)
         tot_sol += solution
         tot_sat_lat[j] = sat_lat[0].value  
         tot_sat_long[j] = sat_long[0].value
@@ -82,14 +84,17 @@ def opti(matrix, R, nbr_sat):
 if __name__ == "__main__":
     df = pd.read_csv("geonames_be_smol.csv",delimiter=";")
     # df = pd.read_csv("geonames_be.csv",delimiter=";")
+    # df = pd.read_csv("geonames_smol.csv",delimiter=";")
     df["latitude"] = df["Coordinates"].str.split(",",expand=True)[0].astype(float)
     df["longitude"] = df["Coordinates"].str.split(",",expand=True)[1].astype(float)
     df.drop(columns=["Coordinates","Name","Country name EN","Elevation"],inplace=True)
 
+    # df_drop, df = train_test_split(df, test_size=0.1)
     mat = df.to_numpy()
     print(mat)
+    print(mat.shape)
 
-    rayon = 10
+    rayon = 40
     sat = 10
 
     opti(mat,rayon,sat)
