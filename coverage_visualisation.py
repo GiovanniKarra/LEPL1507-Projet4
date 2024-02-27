@@ -125,5 +125,5 @@ if __name__ == "__main__":
     data_glob_big : pd.DataFrame = pd.read_csv("geonames_cleared.csv", sep=";")
     data_glob_smol : pd.DataFrame = pd.read_csv("geonames_smol.csv", sep=";")
     
-    visualise_coverage_3D(data_glob_smol, [(4, 50, 1000)],
-                          power=9.0e10, threashold=0.007, show_names=True)
+    visualise_coverage_2D(data_glob_smol, [(4, 50, 1000)],
+                          power=9.0e10, threashold=0.007, show_names=False)
