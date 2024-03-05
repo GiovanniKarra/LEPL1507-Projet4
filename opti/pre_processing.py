@@ -10,34 +10,24 @@ def calc_grid(file: str, grid_size_X = 10, grid_size_Y = 10) -> np.ndarray:
     data : pd.DataFrame = pd.read_csv(file, sep=";")
     cities = np.empty(len(data), dtype=tuple)
 
-    maxX, maxY = -math.inf, -math.inf
-    minX, minY = math.inf, math.inf
+    coor = data["Coordinates"].apply(lambda x: x.split(","))
+    data["x"] = coor.apply(lambda x: float(x[1]))
+    data["y"] = coor.apply(lambda x: float(x[0]))
+    data["weight"] = data["Population"].apply(float)
 
-    for i in range(len(cities)):
-        coor = data["Coordinates"][i].split(",")
-        y  = float(coor[0])
-        x = float(coor[1])
-        weight =  float(data["Population"][i])
+    maxX = data["x"].max()
+    maxY = data["y"].max()
+    minX = data["x"].min()
+    minY = data["y"].min()
 
-        maxX = max(maxX, x)
-        maxY = max(maxY, y)
-        minX = min(minX, x)
-        minY = min(minY, y)
-
-        cities[i] = (x, y, weight)
+    cities = np.array(list(zip(data["x"], data["y"], data["weight"])))
 
     grid = np.empty(grid_size_Y * grid_size_X, dtype=tuple).reshape(grid_size_Y, grid_size_X)
 
-    x = np.linspace(np.floor(minX), np.ceil(maxX), grid_size_X)
-    y = np.linspace(np.floor(minY), np.ceil(maxY), grid_size_Y)
+    x = np.linspace(minX, maxX, grid_size_X)
+    y = np.linspace(minY, maxY, grid_size_Y)
     
-
-
-    for i in enumerate(x):
-        for j in enumerate(y):
-            grid[j[0]][i[0]] = tuple((x[i[0]], y[j[0]]))
-
-
+    grid = np.array(np.meshgrid(x, y)).T.reshape(-1, 2)
 
     return cities, grid
 
