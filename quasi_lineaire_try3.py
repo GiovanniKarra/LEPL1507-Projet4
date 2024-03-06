@@ -18,6 +18,7 @@ def opti(matrix, R, nbr_sat):
     tot_sat_lat = np.zeros(nbr_sat)
     tot_sat_long = np.zeros(nbr_sat)
     tot_couverture = []
+    data_exp = []
 
     start_time = time.time()
     # distance orthodromique
@@ -63,7 +64,7 @@ def opti(matrix, R, nbr_sat):
         tot_sat_long[j] = sat_long[0].value
         tot_couverture.append(couverture.value)
         prev_couv = couverture.value
-        print("sat")
+        data_exp.append([sat_lat[0].value, sat_long[0].value]) 
 
     end_time = time.time()
 
@@ -76,6 +77,7 @@ def opti(matrix, R, nbr_sat):
     print("couverture:", tot_couverture)
     print("sat_lat:", tot_sat_lat)
     print("sat_long:", tot_sat_long)
+    print("data_exp:", data_exp)
 
     visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([tot_sat_long, tot_sat_lat, [1000]*len(tot_sat_long)]).T, (R**2+1000**2)*1000**2*4*3.14159, 1, show_names=False)
     return
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     print(mat)
     print(mat.shape)
 
-    rayon = 40
-    sat = 10
+    rayon = 20
+    sat = 6
 
     opti(mat,rayon,sat)
