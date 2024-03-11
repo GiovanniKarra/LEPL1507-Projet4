@@ -2,9 +2,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+from mpl_toolkits import mplot3d
 from scipy.spatial import distance
 import math
 import time 
+
+
+
+import pre_processing_acc
 
 
 # TODO: fonction lat/lon <-> (x,y,z)
@@ -19,10 +24,10 @@ def calc_grid_3d(file: str, grid_size_X = 10, grid_size_Y = 10, grid_size_Z = 10
     N = grid_size_X
 
     grid = []
-
+    
     for m in range(M):
         for n in range(N):
-            grid.append(np.sin(np.pi * m/M)*np.cos(2*np.pi* n/N), np.sin(np.pi * m/M)*np.sin(2*np.pi* n/N), np.cos(np.pi * m/M))
+            grid.append((np.sin(np.pi * m/M)*np.cos(2*np.pi* n/N), np.sin(np.pi * m/M)*np.sin(2*np.pi* n/N), np.cos(np.pi * m/M)))
 
     return grid
 
@@ -52,7 +57,6 @@ def calc_grid(file: str, grid_size_X = 10, grid_size_Y = 10) -> np.ndarray:
 
     x = np.linspace(np.floor(minX), np.ceil(maxX), grid_size_X)
     y = np.linspace(np.floor(minY), np.ceil(maxY), grid_size_Y)
-    print(minX, minY, maxX, maxY)
     
     for i in enumerate(x):
         for j in enumerate(y):
@@ -126,64 +130,84 @@ def grid_to_index(col: int, row: int, grid_size_Y: int):
 
 
 
+def get_cities(file):
+    data : pd.DataFrame = pd.read_csv(file, sep=";") 
+
+    cities = np.empty(len(data), dtype=pre_processing_acc.coor)
+    for i in range(len(cities)):
+        split = data["Coordinates"][i].split(",")
+        cities[i] = (float(split[0]), float(split[1]))
 
     
-
+    return cities
 
 #### RUN #### 
 
 
 if __name__ == "__main__":
-    # file = "../geonames_smol.csv"
-    file = "../geonames-all-cities-with-a-population-1000.csv"
-    # file = "../geonames_be_smol.csv"
-    data : pd.DataFrame = pd.read_csv(file, sep=";")
-    print(get_min_max(data))
+
+    # file = "../geonames_be.csv"
+    file = "../geonames_smol.csv"
+    # file = "../geonames-all-cities-with-a-population-1000.csv"
 
 
-    s = time.time()
-    # cities, grid = calc_grid(file)
+
+    # grid_acc = np.empty(len(grid) * len(grid[0]), dtype=pre_processing_acc.coor)
+
+    # for i in range(len(grid)):
+    #     for j in range(len(grid[0])):
+    #         grid_acc[i * len(grid) + j] = grid[i][j]
+    #         # print(grid[i][j])
+
+
+    print("Starting...")
+
+    s =  time.time()
+    cities, grid = calc_grid(file, 30, 30)
+    adj = calc_adj(cities, grid, 1)
     e = time.time()
 
-    print(e -s)
-    matrix = grid_avg(data)
+    t1 = e - s
 
-    # f = plt.figure(1)
-
-    # for i in range(len(cities)):
-    #     plt.plot(cities[i][0], cities[i][1], "o", color="blue")
-        
+    print("calc", t1, "s")
 
 
 
-    # for y in range(len(grid)):
-    #     for x in range(len(grid[0])):
-    #         plt.plot(grid[y][x][0], grid[y][x][1], "o", color="red")
+    cities_acc = pre_processing_acc.get_cities(file)
+    s =  time.time()
+    grid_acc = pre_processing_acc.calc_grid(cities_acc, 30, 30)
+    adj = pre_processing_acc.calc_adj(cities_acc, grid_acc, 1)
+    e = time.time()
+
+    t2 = e - s
+
+    print("calc ACC ", t2, "s")
+    print("Acc is ", t1 / t2, " faster")
+    # print(adj)
 
 
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    cax = ax.matshow(matrix, cmap=matplotlib.cm.Spectral_r)
-    fig.colorbar(cax)
 
-    # g = plt.figure(2)
-            
-    # matrix_adj = calc_adj(cities=cities, grid=grid, radius=1)
 
-    # c_nb = 10
 
-    # plt.plot(cities[c_nb][0], cities[c_nb][1], "o", color="green")
 
-    # for i in range(len(matrix_adj[c_nb])):
-    #     col, row = index_to_grid(matrix_adj[c_nb][i], 10, 10)
-  
-    #     plt.plot(grid[col][row][0], 
-    #              grid[col][row][1],
-    #              "o", color="yellow")
 
-    
 
-    plt.show()
+
+
+
+    # plotting
+
+    # fig = plt.figure()
+    # ax = plt.axes(projection='3d')
+
+    # for i in range(len(grid)):
+    #     ax.scatter(grid[i][0],grid[i][1],grid[i][2], 'green')
+    # ax.set_title('3D line plot geeks for geeks')
+    # plt.show()
+
+
+    # plt.show()    
+
 
     
