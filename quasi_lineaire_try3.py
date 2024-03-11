@@ -79,7 +79,7 @@ def opti(matrix, R, nbr_sat):
     print("sat_long:", tot_sat_long)
     print("data_exp:", data_exp)
 
-    visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([tot_sat_long, tot_sat_lat, [1000]*len(tot_sat_long)]).T, (R**2+1000**2)*1000**2*4*3.14159, 1, show_names=False)
+    visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([tot_sat_long, tot_sat_lat, [1000]*len(tot_sat_long)]).T, (R**2+1000**2)*1000**2*4*3.14159, show_names=False)
     return
 
 
