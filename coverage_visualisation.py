@@ -55,7 +55,8 @@ def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame
                        satellites : list[tuple[float, float, float]],
                        radius : float | list[float],
                        show_names : bool = True,
-                       use_cartesian : bool = False):
+                       use_cartesian : bool = False,
+                       covered_ids : list = []):
     """
     @pre :
         cities : a list of tuples (name, longitude, latitude), or a pandas dataframe from a geonames_*.csv file
@@ -70,18 +71,34 @@ def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame
     if isinstance(radius, float): radius = [radius]*len(satellites)
 
     if isinstance(cities, pd.DataFrame):
+        covered_cities = cities.filter(covered_ids, axis=0)
+        cities.drop(covered_ids, axis=0)
+
         cities = [(city, *[float(x) for x in coord.split(",")[::-1]])
               for _, city, _, _, _, coord in cities.to_records()]
+        
+        covered_cities = [(city, *[float(x) for x in coord.split(",")[::-1]])
+              for _, city, _, _, _, coord in covered_cities.to_records()]
 
     ax = plt.figure().add_subplot(projection="3d")
 
     city_locations = np.array([(*city[1:], 0) for city in cities])
+    covered_locations = np.array([(*city[1:], 0) for city in covered_cities])
     for i, (long, lat, _) in enumerate(city_locations):
         long = np.deg2rad(long); lat = np.deg2rad(lat)
         x = np.cos(long)*np.cos(lat); y = np.sin(long)*np.cos(lat); z = np.sin(lat)
         city_locations[i] = np.array((x, y, z))
+
+    for i, (long, lat, _) in enumerate(covered_locations):
+        long = np.deg2rad(long); lat = np.deg2rad(lat)
+        x = np.cos(long)*np.cos(lat); y = np.sin(long)*np.cos(lat); z = np.sin(lat)
+        covered_locations[i] = np.array((x, y, z))
+
     city_locations = city_locations.T
     ax.scatter(city_locations[0], city_locations[1], city_locations[2], s=3)
+
+    covered_locations = covered_locations.T
+    ax.scatter(covered_locations[0], covered_locations[1], covered_locations[2], s=3, color="g")
 
     # if show_names:
     #     for name, x, y in cities:
@@ -147,7 +164,7 @@ if __name__ == "__main__":
         
     if visu_type == "3D":
         visualise_coverage_3D(data, [(4, 50, 1000)],
-                            radius=1000.0, show_names=show)
+                            radius=1000.0, show_names=show, covered_ids=set(range(1, 200)))
         
     else:
         raise Exception("Dimension argument not used correctly,"
