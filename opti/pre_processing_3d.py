@@ -17,7 +17,24 @@ import time
 #       calc_ajd_3d + optimiser
 
 
+
 # basé sur la formule envoyée sur messenger 
+
+
+def get_cities_old(file: str) -> np.ndarray:
+    data : pd.DataFrame = pd.read_csv(file, sep=";")
+    cities = np.empty(len(data), dtype=tuple)
+
+    for i in range(len(cities)):
+        coor = data["Coordinates"][i].split(",")
+        y  = float(coor[0])
+        x = float(coor[1])
+        weight =  float(data["Population"][i])
+
+        cities[i] = (x, y, weight)
+
+    return cities
+
 def calc_grid_3d(grid_size_X = 10, grid_size_Y = 10, h = 1.2) -> np.ndarray:
     """
     In:
@@ -35,7 +52,9 @@ def calc_grid_3d(grid_size_X = 10, grid_size_Y = 10, h = 1.2) -> np.ndarray:
 
     for m in range(M):
         for n in range(N):
-            grid[m*N+n,:] = h * [np.sin(np.pi * m/M)*np.cos(2*np.pi* n/N), np.sin(np.pi * m/M)*np.sin(2*np.pi* n/N), np.cos(np.pi * m/M)]
+            grid[m*N+n,:] = [h * np.sin(np.pi * m/M)*np.cos(2*np.pi* n/N),
+                             h * np.sin(np.pi * m/M)*np.sin(2*np.pi* n/N),
+                             h * np.cos(np.pi * m/M)]
 
     return grid
 
@@ -141,12 +160,11 @@ def grid_to_index(col: int, row: int, grid_size_Y: int):
 def get_cities(file):
     data : pd.DataFrame = pd.read_csv(file, sep=";") 
 
-    cities = np.empty(len(data), dtype=pre_processing_acc_win.coor)
+    cities = np.empty((len(data),2))
     for i in range(len(cities)):
         split = data["Coordinates"][i].split(",")
-        cities[i] = (float(split[0]), float(split[1]))
+        cities[i,:] = [float(split[0]), float(split[1]), float(data["Population"][i])]
 
-    
     return cities
 
 #### RUN #### 
