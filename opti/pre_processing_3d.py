@@ -9,7 +9,7 @@ import time
 
 
 
-import pre_processing_acc_win
+# import pre_processing_acc_win
 
 
 # TODO: fonction lat/lon <-> (x,y,z)
@@ -117,11 +117,11 @@ def calc_adj(cities, grid: np.ndarray, radius: float):
 
         matrix_adj[i] = list()
 
-        for i in range(len(grid)):
+        for j in range(len(grid)):
 
-            if radius >= distance.euclidean((x_c, y_c, z_c), grid[i]):
+            if radius >= distance.euclidean((x_c, y_c, z_c), grid[j]):
             
-                matrix_adj[i].append(i)
+                matrix_adj[i].append(j)
 
     return matrix_adj
 
