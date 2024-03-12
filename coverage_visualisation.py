@@ -32,8 +32,8 @@ def visualise_coverage_2D(cities : list[tuple[str, float, float]] | pd.DataFrame
     for i, (x, y, z) in enumerate(satellites):
 
         t = np.linspace(0, np.pi*2, 100)
-        circle_x = np.cos(t)*radius
-        circle_y = np.sin(t)*radius
+        circle_x = np.cos(t)*radius[i]
+        circle_y = np.sin(t)*radius[i]
         plt.fill(x+circle_x/111.12, y+circle_y/111.12, "orange")
 
     city_locations = np.array([city[1:] for city in cities]).T
@@ -53,8 +53,7 @@ def visualise_coverage_2D(cities : list[tuple[str, float, float]] | pd.DataFrame
 
 def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame,
                        satellites : list[tuple[float, float, float]],
-                       power : float | list[float],
-                       threashold : float,
+                       radius : float | list[float],
                        show_names : bool = True):
     """
     @pre :
@@ -67,31 +66,13 @@ def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame
         a 3D plot of the coverage of the satellites
     """
     
-    if isinstance(power, float): power = [power]*len(satellites)
+    if isinstance(radius, float): radius = [radius]*len(satellites)
 
     if isinstance(cities, pd.DataFrame):
         cities = [(city, *[float(x) for x in coord.split(",")[::-1]])
               for _, city, _, _, _, coord in cities.to_records()]
 
     ax = plt.figure().add_subplot(projection="3d")
-
-    # plt.xlabel("longitude [°]")
-    # plt.ylabel("latitude [°]")
-
-    #plt.subplot()
-
-    # for i, (x, y, z) in enumerate(satellites):
-    #     critical_r = np.sqrt(power[i]/(4*np.pi*threashold))/1000 # en km
-    #     if critical_r <= z:
-    #         print(f"sattelite {i} doesn't cover anything")
-    #         continue
-
-    #     critical_d = np.sqrt(critical_r*critical_r - z*z)
-
-    #     x_ = np.linspace(-critical_d, critical_d, 100)
-    #     y_ = np.sqrt(-np.power(x_, 2)+critical_d*critical_d)
-    #     y2 = -y_
-    #     plt.fill((x_/111.2)+x, (y_/111.2)+y, "orange", (x_/111.2)+x, (y2/111.2)+y, "orange")
 
     city_locations = np.array([(*city[1:], 0) for city in cities])
     for i, (long, lat, _) in enumerate(city_locations):
@@ -100,7 +81,6 @@ def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame
         city_locations[i] = np.array((x, y, z))
     city_locations = city_locations.T
     ax.scatter(city_locations[0], city_locations[1], city_locations[2], s=3)
-    ax.add
 
     # if show_names:
     #     for name, x, y in cities:
@@ -108,8 +88,42 @@ def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame
 
 
     if len(satellites) > 0:
-        satellite_locations = np.array(satellites).T
-        #plt.scatter(satellite_locations[0], satellite_locations[1], c="r")
+        satellite_locations = np.array(satellites, dtype=float)
+        for i, (long, lat, alt) in enumerate(satellite_locations):
+            long = np.deg2rad(long); lat = np.deg2rad(lat)
+            x = np.cos(long)*np.cos(lat); y = np.sin(long)*np.cos(lat); z = np.sin(lat)
+            satellite_locations[i] = np.array((x, y, z))
+
+            # rad = radius[i]
+            # t = np.linspace(0, 2*np.pi, 100)
+            # circle_long = np.cos(t)*rad/111.12+long
+            # circle_lat = np.sin(t)*rad/111.12+lat
+
+            # circle_x = np.cos(circle_long)*np.cos(circle_lat)
+            # circle_y = np.sin(circle_long)*np.cos(circle_lat)
+            # circle_z = np.sin(circle_lat)
+
+            # np.append(circle_x, x)
+            # np.append(circle_y, y)
+            # np.append(circle_z, z)
+
+            # circle_points = np.array([circle_x, circle_y, circle_z])
+
+            # ax.plot_surface(circle_x, circle_y, np.array([circle_z, circle_z]),
+            #                 color="orange")
+
+        satellite_locations = satellite_locations.T*1.2
+        ax.scatter(satellite_locations[0], satellite_locations[1], satellite_locations[2],
+                   color="r")
+
+    # sphère
+    u, v = np.mgrid[0:2*np.pi:50j, 0:np.pi:25j]
+    scale = 0.95
+    x = np.cos(u)*np.sin(v)*scale
+    y = np.sin(u)*np.sin(v)*scale
+    z = np.cos(v)*scale
+    #ax.plot_surface(x, y, z, color="white", shade=False)
+
 
     plt.show()
 
@@ -126,11 +140,11 @@ if __name__ == "__main__":
     
     if visu_type == "2D":
         visualise_coverage_2D(data, [(4, 50, 1000)],
-                            radius=100, show_names=show)
+                            radius=100.0, show_names=show)
         
     if visu_type == "3D":
         visualise_coverage_3D(data, [(4, 50, 1000)],
-                            power=9.0e10, threashold=0.007, show_names=show)
+                            radius=1000.0, show_names=show)
         
     else:
         raise Exception("Dimension argument not used correctly,"
