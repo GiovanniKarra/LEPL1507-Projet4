@@ -54,7 +54,8 @@ def visualise_coverage_2D(cities : list[tuple[str, float, float]] | pd.DataFrame
 def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame,
                        satellites : list[tuple[float, float, float]],
                        radius : float | list[float],
-                       show_names : bool = True):
+                       show_names : bool = True,
+                       use_cartesian : bool = False):
     """
     @pre :
         cities : a list of tuples (name, longitude, latitude), or a pandas dataframe from a geonames_*.csv file
@@ -90,8 +91,10 @@ def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame
     if len(satellites) > 0:
         satellite_locations = np.array(satellites, dtype=float)
         for i, (long, lat, alt) in enumerate(satellite_locations):
-            long = np.deg2rad(long); lat = np.deg2rad(lat)
-            x = np.cos(long)*np.cos(lat); y = np.sin(long)*np.cos(lat); z = np.sin(lat)
+            if not use_cartesian:
+                long = np.deg2rad(long); lat = np.deg2rad(lat)
+                x = np.cos(long)*np.cos(lat); y = np.sin(long)*np.cos(lat); z = np.sin(lat)
+            else: x = long; y = lat; z = alt
             satellite_locations[i] = np.array((x, y, z))
 
             # rad = radius[i]
@@ -122,7 +125,7 @@ def visualise_coverage_3D(cities : list[tuple[str, float, float]] | pd.DataFrame
     x = np.cos(u)*np.sin(v)*scale
     y = np.sin(u)*np.sin(v)*scale
     z = np.cos(v)*scale
-    #ax.plot_surface(x, y, z, color="white", shade=False)
+    ax.plot_surface(x, y, z, color="white", shade=False)
 
 
     plt.show()
