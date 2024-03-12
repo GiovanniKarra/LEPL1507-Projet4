@@ -126,20 +126,16 @@ def grid_avg(data: pd.DataFrame, grid_size_X = 300, grid_size_Y = 300):
 
     return matrix
 
-def calc_adj(cities, grid: np.ndarray, radius: float):
+def calc_adj(cities, grid: np.ndarray, radius: float, h=0.2):
     matrix_adj = np.empty(len(cities), dtype=list)
 
     for i in range(len(cities)):
-        x_c = cities[i][0]
-        y_c = cities[i][1]
-        z_c = cities[i][2]
+        city = cities[i,:]
 
         matrix_adj[i] = list()
 
         for j in range(len(grid)):
-
-            if radius >= distance.euclidean((x_c, y_c, z_c), grid[j]):
-            
+            if radius**2 >= distance.euclidean(city, grid[j])**2 - h**2:
                 matrix_adj[i].append(j)
 
     return matrix_adj
