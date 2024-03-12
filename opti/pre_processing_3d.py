@@ -9,7 +9,7 @@ import time
 
 
 
-import pre_processing_acc
+import pre_processing_acc_win
 
 
 # TODO: fonction lat/lon <-> (x,y,z)
@@ -18,18 +18,27 @@ import pre_processing_acc
 
 
 # basé sur la formule envoyée sur messenger 
-def calc_grid_3d(file: str, grid_size_X = 10, grid_size_Y = 10, grid_size_Z = 10) -> np.ndarray:
-    data : pd.DataFrame = pd.read_csv(file, sep=";")
+def calc_grid_3d(grid_size_X = 10, grid_size_Y = 10, h = 1.2) -> np.ndarray:
+    """
+    In:
+    - grid_size_X: int
+    - grid_size_Y: int
+
+    Out:
+    - grid: list of tuples (x, y, z)
+    """
+
     M = grid_size_Y
     N = grid_size_X
 
-    grid = []
-    
+    grid = np.zeros((M*N, 3))
+
     for m in range(M):
         for n in range(N):
-            grid.append((np.sin(np.pi * m/M)*np.cos(2*np.pi* n/N), np.sin(np.pi * m/M)*np.sin(2*np.pi* n/N), np.cos(np.pi * m/M)))
+            grid[m*N+n,:] = h * [np.sin(np.pi * m/M)*np.cos(2*np.pi* n/N), np.sin(np.pi * m/M)*np.sin(2*np.pi* n/N), np.cos(np.pi * m/M)]
 
     return grid
+
 
 
 
@@ -104,16 +113,15 @@ def calc_adj(cities, grid: np.ndarray, radius: float):
     for i in range(len(cities)):
         x_c = cities[i][0]
         y_c = cities[i][1]
+        z_c = cities[i][2]
+
         matrix_adj[i] = list()
 
-        for y in range(len(grid)):
-            for x in range(len(grid[0])):   
+        for i in range(len(grid)):
 
-
-                 if radius >= distance.euclidean((x_c, y_c), grid[y][x]):
-                    
-                    matrix_adj[i].append(y * len(grid) + x)
-
+            if radius >= distance.euclidean((x_c, y_c, z_c), grid[i]):
+            
+                matrix_adj[i].append(i)
 
     return matrix_adj
 
@@ -133,7 +141,7 @@ def grid_to_index(col: int, row: int, grid_size_Y: int):
 def get_cities(file):
     data : pd.DataFrame = pd.read_csv(file, sep=";") 
 
-    cities = np.empty(len(data), dtype=pre_processing_acc.coor)
+    cities = np.empty(len(data), dtype=pre_processing_acc_win.coor)
     for i in range(len(cities)):
         split = data["Coordinates"][i].split(",")
         cities[i] = (float(split[0]), float(split[1]))
@@ -173,10 +181,10 @@ if __name__ == "__main__":
 
 
 
-    cities_acc = pre_processing_acc.get_cities(file)
+    cities_acc = pre_processing_acc_win.get_cities(file)
     s =  time.time()
-    grid_acc = pre_processing_acc.calc_grid(cities_acc, 30, 30)
-    adj = pre_processing_acc.calc_adj(cities_acc, grid_acc, 1)
+    grid_acc = pre_processing_acc_win.calc_grid(cities_acc, 30, 30)
+    adj = pre_processing_acc_win.calc_adj(cities_acc, grid_acc, 1)
     e = time.time()
 
     t2 = e - s
