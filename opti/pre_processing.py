@@ -31,7 +31,7 @@ def calc_grid(file: str, grid_size_X = 10, grid_size_Y = 10) -> np.ndarray:
 
     x = np.linspace(np.floor(minX), np.ceil(maxX), grid_size_X)
     y = np.linspace(np.floor(minY), np.ceil(maxY), grid_size_Y)
-    print(minX, minY, maxX, maxY)
+    # print(minX, minY, maxX, maxY)
     
 
 
