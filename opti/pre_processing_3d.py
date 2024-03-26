@@ -45,16 +45,14 @@ def calc_grid_3d(grid_size_X = 10, grid_size_Y = 10, h = 1.2) -> np.ndarray:
     - grid: list of tuples (x, y, z)
     """
 
-    M = grid_size_Y
-    N = grid_size_X
-
-    grid = np.zeros((M*N, 3))
-
-    for m in range(M):
-        for n in range(N):
-            grid[m*N+n,:] = [h * np.sin(np.pi * m/M)*np.cos(2*np.pi* n/N),
-                             h * np.sin(np.pi * m/M)*np.sin(2*np.pi* n/N),
-                             h * np.cos(np.pi * m/M)]
+    n = grid_size_X * grid_size_Y
+    goldenRatio = (1 + 5**0.5) / 2
+    i = np.arange(0, n)
+    theta = 2 * np.pi * i / goldenRatio
+    phi = np.arccos(1 - 2*(i)/n)
+    grid = np.array([h * np.cos(theta) * np.sin(phi),
+            h * np.sin(theta) * np.sin(phi),
+            h * np.cos(phi)]).T
 
     return grid
 
@@ -139,7 +137,6 @@ def calc_adj(cities, grid: np.ndarray, radius: float, h=0.2):
                 matrix_adj[i].append(j)
 
     return matrix_adj
-
 
 
 
