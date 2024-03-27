@@ -7,7 +7,8 @@ from sklearn.model_selection import train_test_split
 from scipy.optimize import minimize
 import geopy.distance as dst
 from pre_processing import index_to_grid,calc_grid
-
+import concurrent.futures
+from functools import partial
 from coverage_visualisation import visualise_coverage_2D
 
 def distance(lat1, lon1, lat2, lon2):
@@ -24,6 +25,14 @@ def objective_function(sat_coords, weights, R):
         total_coverage += poids[j] * (1/(1+np.exp(100*(d-R))))
 
     return -total_coverage  # On veut maximiser la couverture
+
+def calculate_coverage(j, nbr_sat, tot_sat_coords, lat, lon, weight, R):
+    coverage = 0
+    for i in range(nbr_sat):
+        if distance(tot_sat_coords[2*i], tot_sat_coords[2*i+1], lat[j], lon[j]) <= R:
+            coverage += weight[j]
+            break
+    return coverage
 
 def callback_function(xk):
     print("Iteration:", callback_function.iteration)
@@ -45,7 +54,6 @@ def opti(matrix, R, init,grid):
 
     start_time = time.time()
 
-    # Initialisation aléatoire des coordonnées des satellites
     initial_guess = []
     for pos in init:
         col,row = index_to_grid(pos,len(grid),len(grid[0]))
@@ -53,17 +61,16 @@ def opti(matrix, R, init,grid):
         initial_guess.append(position[1])
         initial_guess.append(position[0])
 
-    # initial_guess = [-28.65517241, -114.4137931, -28.65517241, 29.37931034, 23.06896552, 115.65517241, 40.31034483, -104.82758621, 61.0 , -56.89655172]
-    # nbr_sat = 5
 
     init_coverage = 0
-    for j in range(len(weight)):
-        for i in range(len(initial_guess)//2):
-            if distance(initial_guess[2*i], initial_guess[2*i+1], lat[j], lon[j]) <= R:
-                init_coverage += weight[j]
-                break
+    partial_coverage = partial(calculate_coverage, nbr_sat=nbr_sat, tot_sat_coords=initial_guess, lat=lat, lon=lon, weight=weight, R=R)
 
-    init_sol = init_coverage
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = executor.map(partial_coverage, range(len(weight)))
+        for coverage in results:
+            init_coverage += coverage
+
+    init_sol = init_coverage    
 
     delta_grid_lat = (grid[-1][-1][1] - grid[0][0][1])/ len(grid)
     delta_grid_long = (grid[-1][-1][0] - grid[0][0][0]) / len(grid[0])  
@@ -104,14 +111,15 @@ def opti(matrix, R, init,grid):
             if distance(result.x[0], result.x[1], full_data[i][1], full_data[i][2]) <= R:
                 full_data[i][0] = 0
 
-    # Calcul de la couverture pour tous les satellites
     final_coverage = 0
-    for j in range(len(weight)):
-        for i in range(nbr_sat):
-            if distance(tot_sat_coords[i][0], tot_sat_coords[i][1], lat[j], lon[j]) <= R:
-                final_coverage += weight[j]
-                break
-    tot_sol = final_coverage
+    partial_coverage = partial(calculate_coverage, nbr_sat=nbr_sat, tot_sat_coords=tot_sat_coords, lat=lat, lon=lon, weight=weight, R=R)
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = executor.map(partial_coverage, range(len(weight)))
+        for coverage in results:
+            final_coverage += coverage
+
+    tot_sol = final_coverage    
 
     print("Time to solve:", time.time() - start_time)
     print("Solution:", tot_sol)
@@ -152,11 +160,11 @@ if __name__ == "__main__":
     # init = [44, 53, 56, 62, 64, 65]
     # cities, grid = calc_grid(name, 10, 10)
     
-    # init = [112, 125, 130, 138, 156, 158]
-    # cities, grid = calc_grid(name, 15, 15)
+    init = [112, 125, 130, 138, 156, 158]
+    cities, grid = calc_grid(name, 15, 15)
     
-    init = [190, 227, 234, 264, 269, 272]
-    cities, grid = calc_grid(name, 20, 20)
+    # init = [190, 227, 234, 264, 269, 272]
+    # cities, grid = calc_grid(name, 20, 20)
     
     # init = [465, 521, 531, 577, 618, 644]
     # cities, grid = calc_grid(name, 30, 30)
