@@ -148,6 +148,7 @@ if __name__ == "__main__":
     df["latitude"] = df["Coordinates"].str.split(",",expand=True)[0].astype(float)
     df["longitude"] = df["Coordinates"].str.split(",",expand=True)[1].astype(float)
     df.drop(columns=["Coordinates","Name","Country name EN","Elevation"],inplace=True)
+    garbage, df = train_test_split(df, test_size=0.1, random_state=42)
 
     mat = df.to_numpy()
 
@@ -183,18 +184,5 @@ if __name__ == "__main__":
             8088, 8216, 8347, 8358, 8418, 8650, 8745, 8760, 8857, 9051, 9058, 9162, 9254, 9364,
             9366, 9855]
     cities, grid = calc_grid(name, 100, 100)
-
-
-
-
-
-
-
-    #### BENCHMARK
-    # init = [584] # 1 41,9% => 41,9% tol 1
-    # init = [560, 578, 584] # 3 72.93% => 73.87% tol 1
-    # init = [435, 521, 560, 577, 615] # 5 91,53% => 91,71% tol 0,75
-    # init = [261, 402, 438, 442, 464, 549, 590, 606, 642, 646] # 10 99,65% => 99,66% tol 0,75
-    # cities, grid = calc_grid(name, 30, 30)
 
     opti(mat,rayon, init,grid)
