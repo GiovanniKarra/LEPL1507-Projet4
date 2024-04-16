@@ -150,9 +150,10 @@ def calc_adj2(cities, grid: np.ndarray, radius: float, h=0.2):
 
 
     dist = distance.cdist(cities, grid)
-    dist =  np.where(dist[0] <= radius, dist[0], 0)
+    # dist =  np.where(dist[0] <= radius, dist[0], 0)
 
     for i in range(len(cities)):
+        dist =  np.where(dist[i] <= radius, dist[i], 0)
         matrix_adj[i] = np.nonzero(dist)[0]
 
 
