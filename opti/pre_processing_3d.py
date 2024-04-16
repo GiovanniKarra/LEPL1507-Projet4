@@ -23,17 +23,24 @@ import time
 
 def get_cities_old(file: str) -> np.ndarray:
     data : pd.DataFrame = pd.read_csv(file, sep=";")
-    cities = np.empty(len(data), dtype=tuple)
+    cities = np.empty(len(data), dtype=np.ndarray)
+
+    cities = np.zeros((len(data), 3))
+    population = np.empty(len(data), dtype=float)
+    
 
     for i in range(len(cities)):
         coor = data["Coordinates"][i].split(",")
-        y  = float(coor[0])
-        x = float(coor[1])
+        lat = float(coor[0])
+        lon = float(coor[1])
         weight =  float(data["Population"][i])
+        x = math.cos(lat) * math.cos(lon)
+        y = math.cos(lat) * math.sin(lon)
+        z = math.sin(lat)
+        cities[i] = [x, y, z]
+        population[i] = weight
 
-        cities[i] = (x, y, weight)
-
-    return cities
+    return cities, population
 
 def calc_grid_3d(grid_size_X = 10, grid_size_Y = 10, h = 1.2) -> np.ndarray:
     """
