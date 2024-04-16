@@ -138,6 +138,18 @@ def calc_adj(cities, grid: np.ndarray, radius: float, h=0.2):
 
     return matrix_adj
 
+def calc_adj2(cities, grid: np.ndarray, radius: float, h=0.2):
+    matrix_adj = np.empty(len(cities), dtype=np.ndarray)
+
+
+    dist = distance.cdist(cities, grid)
+    dist =  np.where(dist[0] <= radius, dist[0], 0)
+
+    for i in range(len(cities)):
+        matrix_adj[i] = np.nonzero(dist)[0]
+
+
+    return matrix_adj
 
 
 def index_to_grid(index: int, grid_size_X: int, grid_size_Y: int) -> int:
