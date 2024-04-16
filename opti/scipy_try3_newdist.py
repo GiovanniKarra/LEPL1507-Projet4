@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from scipy.optimize import minimize
 import geopy.distance as dst
-from pre_processing import index_to_grid,calc_grid
+from pre_processing_3d import get_cities_old, calc_grid_3d
 
 from coverage_visualisation import visualise_coverage_2D
 
@@ -157,24 +157,6 @@ if __name__ == "__main__":
     
     init = [190, 227, 234, 264, 269, 272]
     cities, grid = calc_grid(name, 20, 20)
-    
-    # init = [465, 521, 531, 577, 618, 644]
-    # cities, grid = calc_grid(name, 30, 30)
-    
-    # init = [820,  934,  948, 1049, 1103, 1138]
-    # cities, grid = calc_grid(name, 40, 40)
-    
-    # init = [1175, 1468, 1486, 1612, 1630, 1724]
-    # cities, grid = calc_grid(name, 50, 50)
 
-    # init = [ 598,  926,  955, 2061, 2327, 2754, 3049, 3656, 3727, 3886, 3953, 4081, 4217, 4444,
-    #         4920, 5072, 5245, 5280, 5312, 5338, 5460, 5471, 5573, 5672, 5809, 5819, 5871, 6058,
-    #         6084, 6176, 6184, 6187, 6265, 6275, 6283, 6306, 6368, 6384, 6476, 6481, 6485, 6562,
-    #         6573, 6584, 6672, 6685, 6687, 6784, 6809, 6863, 6871, 6882, 6982, 6987, 7057, 7086,
-    #         7087, 7103, 7183, 7186, 7202, 7257, 7260, 7287, 7385, 7386, 7444, 7460, 7487, 7490,
-    #         7494, 7555, 7585, 7685, 7782, 7789, 7844, 7855, 7860, 7918, 7984, 7988, 8013, 8060,
-    #         8088, 8216, 8347, 8358, 8418, 8650, 8745, 8760, 8857, 9051, 9058, 9162, 9254, 9364,
-    #         9366, 9855]
-#     cities, grid = calc_grid(name, 100, 100)
 
     opti(mat,rayon, init,grid)

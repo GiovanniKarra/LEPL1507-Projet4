@@ -212,11 +212,11 @@ if __name__ == "__main__":
 
 
 
-    cities_acc = pre_processing_acc_win.get_cities(file)
-    s =  time.time()
-    grid_acc = pre_processing_acc_win.calc_grid(cities_acc, 30, 30)
-    adj = pre_processing_acc_win.calc_adj(cities_acc, grid_acc, 1)
-    e = time.time()
+    # cities_acc = pre_processing_acc_win.get_cities(file)
+    # s =  time.time()
+    # grid_acc = pre_processing_acc_win.calc_grid(cities_acc, 30, 30)
+    # adj = pre_processing_acc_win.calc_adj(cities_acc, grid_acc, 1)
+    # e = time.time()
 
     t2 = e - s
 
