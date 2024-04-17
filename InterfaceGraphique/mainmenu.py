@@ -2,6 +2,7 @@ from PyQt5.QtCore import (
 	Qt
 )
 from PyQt5.QtWidgets import (
+	QWidget,
 	QVBoxLayout,
 	QLabel,
 	QPushButton
@@ -11,9 +12,10 @@ from PyQt5.QtGui import (
 )
 
 
-class MainMenu(QVBoxLayout):
+class MainMenu(QWidget):
 	def __init__(self, mainwindow):
 		super().__init__()
+		
 		title = QLabel()
 		title.setText("<h1>Optimisateur 1315</h1>")
 		title.setAlignment(Qt.AlignmentFlag.AlignHCenter)
@@ -30,7 +32,10 @@ class MainMenu(QVBoxLayout):
 		quit_button = QPushButton("Quit")
 		quit_button.clicked.connect(mainwindow.close)
 
-		self.addWidget(title)
-		self.addWidget(image_widget)
-		self.addWidget(start_button)
-		self.addWidget(quit_button)
+		layout = QVBoxLayout()
+		self.setLayout(layout)
+
+		layout.addWidget(title)
+		layout.addWidget(image_widget)
+		layout.addWidget(start_button)
+		layout.addWidget(quit_button)

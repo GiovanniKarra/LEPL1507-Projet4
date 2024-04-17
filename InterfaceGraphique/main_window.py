@@ -14,7 +14,7 @@ from PyQt5.QtGui import (
 )
 
 from mainmenu import MainMenu
-from work_layout import WorkLayout
+from workmenu import WorkMenu
 
 
 class MainWindow(QMainWindow):
@@ -24,12 +24,7 @@ class MainWindow(QMainWindow):
 		self.setWindowTitle("Projet4 - Groupe 5")
 		self.setFixedSize(QSize(1280, 720))
 
-		self.set_layout(MainMenu(self))
-
-	def set_layout(self, layout):
-		widget = QWidget()
-		widget.setLayout(layout)
-		self.setCentralWidget(widget)
+		self.setCentralWidget(MainMenu(self))
 
 	def goto_work(self):
-		self.set_layout(WorkLayout(self))
+		self.setCentralWidget(WorkMenu(self))
