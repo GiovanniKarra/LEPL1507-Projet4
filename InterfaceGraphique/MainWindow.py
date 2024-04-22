@@ -4,17 +4,13 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtWidgets import (
 	QMainWindow,
-	QVBoxLayout,
-	QLabel,
-	QWidget,
-	QPushButton
 )
 from PyQt5.QtGui import (
 	QMovie
 )
 
-from mainmenu import MainMenu
-from workmenu import WorkMenu
+from MainMenu import MainMenu
+from WorkMenu import WorkMenu
 
 
 class MainWindow(QMainWindow):
