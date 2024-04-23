@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import (
 	QFileDialog,
 	QLabel
 )
+from PyQt5.QtCore import (
+	Qt
+)
 
 
 class Controls(QWidget):
@@ -15,21 +18,21 @@ class Controls(QWidget):
 		
 		layout = QVBoxLayout()
 		self.setLayout(layout)
+		layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-		file_selection_title = QLabel()
-		file_selection_title.setText("<h4>Select input file</h4>")
+		file_selection = FileSelectionWidget("Select input file")
 
-		file_selection = FileSelectionWidget()
-
-		layout.addWidget(file_selection_title)
 		layout.addWidget(file_selection)
 
 
 class FileSelectionWidget(QWidget):
-	def __init__(self):
+	def __init__(self, title=""):
 		super().__init__()
 
-		self.setLayout(QHBoxLayout())
+		self.setLayout(QVBoxLayout())
+
+		selection_widget = QWidget()
+		selection_widget.setLayout(QHBoxLayout())
 
 		file_selection_button = QPushButton("select file")
 		file_selection_button.clicked.connect(self.open_file_selection_dialog)
@@ -38,8 +41,16 @@ class FileSelectionWidget(QWidget):
 		self.file_name.setEnabled(False)
 		self.file_name.setText("<input file>")
 
-		self.layout().addWidget(self.file_name)
-		self.layout().addWidget(file_selection_button)
+		selection_widget.layout().addWidget(self.file_name)
+		selection_widget.layout().addWidget(file_selection_button)
+
+		if title != "":
+			file_selection_title = QLabel()
+			file_selection_title.setText("<h4>%s</h4>"%title)
+
+			self.layout().addWidget(file_selection_title)
+
+		self.layout().addWidget(selection_widget)
 		
 
 	def open_file_selection_dialog(self):
