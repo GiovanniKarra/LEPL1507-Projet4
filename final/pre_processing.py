@@ -43,6 +43,10 @@ def get_cities_old(file: str) -> np.ndarray:
 
     return cities, population
 
+def from_XYZ_to_lat_long(coor): # coor = (x, y, z)
+    return (np.arcsin(coor[2]), np.arctan2(coor[1], coor[0]))
+
+
 def calc_grid_3d(grid_size_X = 10, grid_size_Y = 10, h = 1.2) -> np.ndarray:
     """
     In:
@@ -195,61 +199,31 @@ if __name__ == "__main__":
     file = "../geonames_smol.csv"
     # file = "../geonames-all-cities-with-a-population-1000.csv"
 
+    grid = calc_grid_3d(1000, h=1.2)
+    zone = [0,90,0,90]
 
-
-    # grid_acc = np.empty(len(grid) * len(grid[0]), dtype=pre_processing_acc.coor)
-
-    # for i in range(len(grid)):
-    #     for j in range(len(grid[0])):
-    #         grid_acc[i * len(grid) + j] = grid[i][j]
-    #         # print(grid[i][j])
-
-
-    print("Starting...")
-
-    s =  time.time()
-    cities, grid = calc_grid(file, 30, 30)
-    adj = calc_adj(cities, grid, 1)
-    e = time.time()
-
-    t1 = e - s
-
-    print("calc", t1, "s")
+    if zone is not None: # zone = (lat_min, lat_max, long_min, long_max)
+        lat_min = zone[0] 
+        lat_max = zone[1] 
+        lon_min = zone[2] 
+        lon_max = zone[3] 
+        new_grid = []
+        for i in range(len(grid)):
+            temp = from_XYZ_to_lat_long(grid[i])
+            if lat_min > temp[0] or lat_max < temp[0] or lon_min > temp[1] or lon_max < temp[1]:
+                new_grid.append(grid[i]) 
+        grid = np.array(new_grid)
 
 
 
-    cities_acc = pre_processing_acc_win.get_cities(file)
-    s =  time.time()
-    grid_acc = pre_processing_acc_win.calc_grid(cities_acc, 30, 30)
-    adj = pre_processing_acc_win.calc_adj(cities_acc, grid_acc, 1)
-    e = time.time()
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
 
-    t2 = e - s
+    for i in range(len(grid)):
+        ax.scatter(grid[i][0],grid[i][1],grid[i][2], 'green')
+    ax.set_title('3D line plot geeks for geeks')
+    plt.show()
 
-    print("calc ACC ", t2, "s")
-    print("Acc is ", t1 / t2, " faster")
-    # print(adj)
-
-
-
-
-
-
-
-
-
-
-
-
-    # plotting
-
-    # fig = plt.figure()
-    # ax = plt.axes(projection='3d')
-
-    # for i in range(len(grid)):
-    #     ax.scatter(grid[i][0],grid[i][1],grid[i][2], 'green')
-    # ax.set_title('3D line plot geeks for geeks')
-    # plt.show()
 
 
     # plt.show()    
