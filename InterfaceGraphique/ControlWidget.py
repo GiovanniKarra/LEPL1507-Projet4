@@ -8,24 +8,31 @@ from PyQt5.QtWidgets import (
 	QLabel
 )
 from PyQt5.QtCore import (
-	Qt
+	Qt,
+	pyqtBoundSignal,
+	pyqtSignal
 )
 
-
 class Controls(QWidget):
+
+	file_selected = pyqtSignal(str)
+
 	def __init__(self):
 		super().__init__()
-		
+
 		layout = QVBoxLayout()
 		self.setLayout(layout)
 		layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-
-		file_selection = FileSelectionWidget("Select input file")
+		
+		file_selection = FileSelectionWidget(title="Select input file")
+		file_selection.file_selected.connect(self.file_selected)
 
 		layout.addWidget(file_selection)
 
 
 class FileSelectionWidget(QWidget):
+	file_selected = pyqtSignal(str)
+
 	def __init__(self, title=""):
 		super().__init__()
 
@@ -40,6 +47,7 @@ class FileSelectionWidget(QWidget):
 		self.file_name = QLineEdit()
 		self.file_name.setEnabled(False)
 		self.file_name.setText("<input file>")
+		self.file_name.textChanged.connect(self.file_selected)
 
 		selection_widget.layout().addWidget(self.file_name)
 		selection_widget.layout().addWidget(file_selection_button)
@@ -51,7 +59,7 @@ class FileSelectionWidget(QWidget):
 			self.layout().addWidget(file_selection_title)
 
 		self.layout().addWidget(selection_widget)
-		
+
 
 	def open_file_selection_dialog(self):
 		diag = QFileDialog()

@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import (
 	QHBoxLayout,
 	QWidget,
+	QDialog
 )
 
 from VisuWidget import Visuals
@@ -22,3 +23,10 @@ class WorkMenu(QWidget):
 
 		layout.addWidget(left_widget)
 		layout.addWidget(right_widget)
+
+		print(left_widget)
+		left_widget.file_selected.connect(self.file_selected)
+
+
+	def file_selected(self, filename):
+		print(filename)
