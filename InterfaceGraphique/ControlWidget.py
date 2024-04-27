@@ -27,7 +27,10 @@ class Controls(QWidget):
 		file_selection = FileSelectionWidget(title="Select input file")
 		file_selection.file_selected.connect(self.file_selected)
 
+		dim_selection = DimSelectionWidget()
+
 		layout.addWidget(file_selection)
+		layout.addWidget(dim_selection)
 
 
 class FileSelectionWidget(QWidget):
@@ -66,3 +69,29 @@ class FileSelectionWidget(QWidget):
 		diag.fileSelected.connect(lambda x: self.file_name.setText(x))
 
 		diag.exec()
+
+
+class DimSelectionWidget(QWidget):
+
+	def __init__(self):
+		super().__init__()
+
+		self.threeD = False
+
+		self.setLayout(QHBoxLayout())
+
+		self.twoD_button = QPushButton("2D")
+		self.twoD_button.setEnabled(False)
+		self.twoD_button.pressed.connect(self.toggle_threeD)
+
+		self.threeD_button = QPushButton("3D")
+		self.threeD_button.pressed.connect(self.toggle_threeD)
+
+		self.layout().addWidget(self.twoD_button)
+		self.layout().addWidget(self.threeD_button)
+
+	def toggle_threeD(self):
+		self.threeD = not self.threeD
+
+		self.twoD_button.setEnabled(self.threeD)
+		self.threeD_button.setEnabled(not self.threeD)

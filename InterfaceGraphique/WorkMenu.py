@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, "../opti/")
+
 from PyQt5.QtWidgets import (
 	QHBoxLayout,
 	QWidget,
@@ -12,6 +15,8 @@ class WorkMenu(QWidget):
 	def __init__(self, mainwindow):
 		super().__init__()
 
+		self.file = ""
+
 		layout = QHBoxLayout()
 		self.setLayout(layout)
 
@@ -24,9 +29,9 @@ class WorkMenu(QWidget):
 		layout.addWidget(left_widget)
 		layout.addWidget(right_widget)
 
-		print(left_widget)
 		left_widget.file_selected.connect(self.file_selected)
 
 
 	def file_selected(self, filename):
 		print(filename)
+		self.file = filename
