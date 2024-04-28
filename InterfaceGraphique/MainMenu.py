@@ -1,5 +1,6 @@
 from PyQt5.QtCore import (
-	Qt
+	Qt,
+	pyqtSignal
 )
 from PyQt5.QtWidgets import (
 	QWidget,
@@ -13,7 +14,10 @@ from PyQt5.QtGui import (
 
 
 class MainMenu(QWidget):
-	def __init__(self, mainwindow):
+	start = pyqtSignal()
+	quit = pyqtSignal()
+
+	def __init__(self):
 		super().__init__()
 		
 		title = QLabel()
@@ -27,10 +31,10 @@ class MainMenu(QWidget):
 		image_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 		start_button = QPushButton("Start")
-		start_button.clicked.connect(mainwindow.goto_work)
+		start_button.clicked.connect(self.start)
 
 		quit_button = QPushButton("Quit")
-		quit_button.clicked.connect(mainwindow.close)
+		quit_button.clicked.connect(self.quit)
 
 		layout = QVBoxLayout()
 		self.setLayout(layout)
