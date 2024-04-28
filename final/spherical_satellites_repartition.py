@@ -13,7 +13,7 @@ import models
 import coverage_visualisation as visu
 
 
-def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_weights, grid_size=10000, h=1.2, radius_acceptable=0.21):
+def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_weights, grid_size=10000, h=1.2, radius_acceptable=0.21, zone=None):
     """
     Calcule sur la sphère la répartition des satellites optimale pour obtenir une couverture de population maximale.
 
@@ -40,6 +40,22 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
 
     # Pre-processing
     grid = pre.calc_grid_3d(grid_size, h)
+
+    # Check if 'zone iterdite' is not None
+    if zone is not None: # zone = (lat_min, lat_max, long_min, long_max)
+        lat_min = zone[0] 
+        lat_max = zone[1] 
+        lon_min = zone[2] 
+        lon_max = zone[3] 
+        new_grid = []
+        for i in range(len(grid)):
+            temp = pre.from_XYZ_to_lat_long(grid[i])
+            if lat_min > temp[0] or lat_max < temp[0] or lon_min > temp[1] or lon_max < temp[1]:
+                new_grid.append(grid[i]) 
+        grid = np.array(new_grid)
+
+
+
     matrix_adj = pre.calc_adj(cities_coordinates, grid, radius_acceptable)
     print("Pre-processing terminé")
 
