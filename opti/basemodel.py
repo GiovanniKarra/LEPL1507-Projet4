@@ -10,7 +10,7 @@ import pre_processing
 #  BASE MODEL
 # ----------------
 
-def basemodel(N_sat, N_cities, N_grid, population, coverage):
+def basemodel(N_sat, N_cities, N_grid, population, coverage, verbose=False):
     """
     N_sat:      number of satellites to place
     N_cities:   number of cities

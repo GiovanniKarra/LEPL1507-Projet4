@@ -9,13 +9,17 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import (
 	Qt,
-	pyqtBoundSignal,
 	pyqtSignal
 )
+from PyQt5.QtGui import (
+	QIntValidator
+)
+
 
 class Controls(QWidget):
 
 	file_selected = pyqtSignal(str)
+	solve = pyqtSignal(int, bool)  # num_de_satellites: int, 3D: bool
 
 	def __init__(self):
 		super().__init__()
@@ -28,9 +32,21 @@ class Controls(QWidget):
 		file_selection.file_selected.connect(self.file_selected)
 
 		dim_selection = DimSelectionWidget()
+		dim_selection.setFixedWidth(120)
+
+		num_selection = SatNumWidget()
+		num_selection.setFixedWidth(235)
+
+		solve_button = QPushButton("Run")
+		solve_button.pressed.connect(
+			lambda: self.solve.emit(num_selection.sat_num, dim_selection.threeD)
+		)
+		solve_button.setFixedWidth(50)
 
 		layout.addWidget(file_selection)
 		layout.addWidget(dim_selection)
+		layout.addWidget(num_selection)
+		layout.addWidget(solve_button)
 
 
 class FileSelectionWidget(QWidget):
@@ -95,3 +111,26 @@ class DimSelectionWidget(QWidget):
 
 		self.twoD_button.setEnabled(self.threeD)
 		self.threeD_button.setEnabled(not self.threeD)
+
+
+class SatNumWidget(QWidget):
+	def __init__(self):
+		super().__init__()
+
+		self.sat_num = 0
+
+		self.setLayout(QHBoxLayout())
+
+		text = QLabel()
+		text.setText("Number of satellites :")
+
+		num_field = QLineEdit()
+		num_field.setValidator(QIntValidator(0, 9999, self))
+		num_field.setText("0")
+		num_field.textEdited.connect(self.set_num)
+
+		self.layout().addWidget(text)
+		self.layout().addWidget(num_field)
+
+	def set_num(self, num):
+		self.sat_num = int(num)

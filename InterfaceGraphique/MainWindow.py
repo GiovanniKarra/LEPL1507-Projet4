@@ -20,7 +20,11 @@ class MainWindow(QMainWindow):
 		self.setWindowTitle("Projet4 - Groupe 5")
 		self.setFixedSize(QSize(1280, 720))
 
-		self.setCentralWidget(MainMenu(self))
+		mainmenu = MainMenu()
+		mainmenu.start.connect(self.goto_work)
+		mainmenu.quit.connect(self.close)
+
+		self.setCentralWidget(mainmenu)
 
 	def goto_work(self):
-		self.setCentralWidget(WorkMenu(self))
+		self.setCentralWidget(WorkMenu())
