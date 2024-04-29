@@ -34,6 +34,7 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
 	covered_population: population couverte
     """
 
+    cities_xyz = cities_latlon_to_xyz(cities_coordinates)
 
     #sqrtn = 3.09 / (2**0.5 * radius) # grid size idéale jsplus
 
@@ -42,7 +43,7 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
 
     # Pre-processing
     grid = pre.calc_grid_3d(grid_size, h)
-    matrix_adj = pre.calc_adj(cities_coordinates, grid, radius_acceptable)
+    matrix_adj = pre.calc_adj(cities_xyz, grid, radius_acceptable)
     print("Pre-processing terminé")
 
     # Solve problem
@@ -62,13 +63,13 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
     print("Covered population:", covered_population_relative)
 
     ids_sat = np.array(np.where(save_x > 0.9))[0]
-    print("ID Satellites:", ids_sat)
+    # print("ID Satellites:", ids_sat)
 
     ids_villes = np.array(np.where(save_y > 0.9))[0]
-    print("ID Villes couvertes:", ids_villes)
+    # print("ID Villes couvertes:", ids_villes)
 
     satellites_coordinates = np.array([grid[i] for i in ids_sat])
-    print("Coords Satellites:\n", satellites_coordinates)
+    # print("Coords Satellites:\n", satellites_coordinates)
 
     # satellites_coordinates
 
@@ -83,16 +84,25 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
 
     tot_sol = 0
     tot_sat_coords = []
-    # R = 0.21 * 6371  # Rayon de couverture des satellites en km
-    R = 40
+    R = radius_acceptable * 6371 * 4.1 # Rayon de couverture des satellites en km
+    print("R:", R)
 
     start_time = time.time()
+    
+    print("pos",satellites_coordinates)
 
     # Initialisation aléatoire des coordonnées des satellites
     initial_guess = []
     for pos in satellites_coordinates:
-        initial_guess.append(np.arcsin(pos[2]/h))
-        initial_guess.append(np.arccos(pos[0]/(np.cos(np.arcsin(pos[2]/h))*h)))
+        initial_guess.append(np.arcsin(pos[2]/(h**2)))
+        initial_guess.append(np.arccos(pos[0]/((h**2)*np.cos(np.arcsin(pos[2]/(h**2)))))+2.5)
+        # r = np.sqrt(pos[0]**2 + pos[1]**2 + pos[2]**2)
+        # theta = np.arctan(pos[1]/pos[0])
+        # phi = np.arccos(pos[2]/r)
+        # initial_guess.append(np.rad2deg(np.pi/2 - theta))
+        # initial_guess.append(np.rad2deg(phi - np.pi))
+        
+    print("Initial guess:", initial_guess)
 
     init_coverage = 0
     for j in range(len(weight)):
@@ -107,7 +117,7 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
 
     full_data_pd = pd.DataFrame(np.column_stack((cities_weights, lat,lon)), columns=["population", "latitude", "longitude"])
     full_data = full_data_pd.to_numpy()
-    print(full_data)
+    # print(full_data)
 
     for i in range(N_satellites):
         # pass
@@ -122,17 +132,15 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
         result = initial_guess[2*i:2*(i+1)]
 
         zone = pd.DataFrame(full_data, columns=["population", "latitude", "longitude"])
-        # zone = zone[zone["latitude"].between(result[0]-delta_grid_lat-R*(1/113)*(50/100),result[0]+delta_grid_lat+R*(1/113)*(50/100))]
-        zone = zone[zone["latitude"].between(result[0]-R*(1/113)*(50/100),result[0]+R*(1/113)*(50/100))]
-        # zone = zone[zone["longitude"].between(result[1]-delta_grid_long-R*(1/113)*(50/100),result[1]+delta_grid_long+R*(1/113)*(50/100))]
-        zone = zone[zone["longitude"].between(result[1]-R*(1/113)*(50/100),result[1]+R*(1/113)*(50/100))]
+        # zone = zone[zone["latitude"].between(result[0]-R*(1/113)*(50/100),result[0]+R*(1/113)*(50/100))]
+        zone = zone[zone["latitude"].between(result[0]-R,result[0]+R)]
+        # zone = zone[zone["longitude"].between(result[1]-R*(1/113)*(50/100),result[1]+R*(1/113)*(50/100))]
+        zone = zone[zone["longitude"].between(result[1]-R,result[1]+R)]
         zone = zone.to_numpy()
 
         result = minimize(add_func.objective_function, initial_guess[2*i:2*(i+1)], args=(zone, R)
                           , bounds=bounds
                           , callback=add_func.callback_function
-                        #   , method="L-BFGS-B"
-                        #   , options={'reshape': True}
                     )
         
         tot_sat_coords.append(result.x)
@@ -156,25 +164,50 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
     print("Coverage percentage:", 100*tot_sol / np.sum(cities_weights), "%")
     print("initial solution:", 100*init_sol / np.sum(cities_weights), "%")
 
-    visu.visualise_coverage_3D(cities_coordinates, satellites_coordinates, radius_acceptable, use_cartesian=True, covered_ids=ids_villes)
+    # visu.visualise_coverage_3D(cities_coordinates, satellites_coordinates, radius_acceptable, use_cartesian=True, covered_ids=ids_villes)
     
     return satellites_coordinates, covered_population
 
+def cities_latlon_to_xyz(cities_coordinates_latlon):
+    n = len(cities_coordinates_latlon)
+    cities = np.zeros((n, 3))
+    for i in range(n):
+        lat = cities_coordinates_latlon[i][0]
+        lon = cities_coordinates_latlon[i][1]
+        x = math.cos(lat) * math.cos(lon)
+        y = math.cos(lat) * math.sin(lon)
+        z = math.sin(lat)
+        cities[i] = [x, y, z]
+    return cities
 
 
-N_satellites = 5
+N_satellites = 1
 # cities_coordinates = [(1,0,0), (0,1,0), (0,0,1), (-1,0,0)]
 # cities_weights = [1, 2, 3, 4]
 
-file = "../geonames_smol.csv"
+# file = "../geonames_smol.csv"
+file = "../geonames_be_smol.csv"
+
+# Get cities coordinates and weights from .csv
+data = pd.read_csv(file, sep=";")
+cities_weights = data["Population"]           
+
+lat = data["Coordinates"].str.split(",",expand=True)[0].astype(float)
+lon = data["Coordinates"].str.split(",",expand=True)[1].astype(float)
+cities_coordinates_latlon = np.array([lat,lon]).T
+
+# cities_coordinates_latlon est au format
+# [[lat1, lon1],
+#  [lat2, lon2], 
+#  [lat3, lon3]]
 
 
-cities_coordinates, cities_weights = pre.get_cities_old(file)
-
-print(cities_coordinates)
-
-
-satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, cities_coordinates, cities_weights)
-print(satellites_coordinates)
+cities_coordinates_xyz = cities_latlon_to_xyz(cities_coordinates_latlon)
+# cities_coordinates_xyz est au format
+# [[x1, y1, z1],
+#  [x2, y2, z2],
+#  [x3, y3, z3]]
 
 
+
+satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, cities_coordinates_latlon, cities_weights)
