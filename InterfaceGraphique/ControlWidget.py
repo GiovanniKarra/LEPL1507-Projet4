@@ -5,24 +5,21 @@ from PyQt5.QtWidgets import (
 	QHBoxLayout,
 	QLineEdit,
 	QFileDialog,
-	QLabel,
-	QCheckBox
+	QLabel
 )
 from PyQt5.QtCore import (
 	Qt,
 	pyqtSignal
 )
 from PyQt5.QtGui import (
-	QIntValidator,
-	QDoubleValidator
+	QIntValidator
 )
 
 
 class Controls(QWidget):
 
 	file_selected = pyqtSignal(str)
-	solve = pyqtSignal(int, bool, float)  # num_de_satellites: int, 3D: bool
-	set_names = pyqtSignal(int)
+	solve = pyqtSignal(int, bool)  # num_de_satellites: int, 3D: bool
 
 	def __init__(self):
 		super().__init__()
@@ -37,27 +34,18 @@ class Controls(QWidget):
 		dim_selection = DimSelectionWidget()
 		dim_selection.setFixedWidth(120)
 
-		sat_num_selection = NumWidget("Number of satellites")
-		sat_num_selection.setFixedWidth(235)
-
-		radius_selection = NumWidget("Satellite radius", float)
-		radius_selection.setFixedWidth(200)
+		num_selection = SatNumWidget()
+		num_selection.setFixedWidth(235)
 
 		solve_button = QPushButton("Run")
 		solve_button.pressed.connect(
-			lambda: self.solve.emit(sat_num_selection.num, dim_selection.threeD, radius_selection.num)
+			lambda: self.solve.emit(num_selection.sat_num, dim_selection.threeD)
 		)
 		solve_button.setFixedWidth(50)
 
-		show_names = ShowNamesWidget()
-		show_names.setFixedWidth(200)
-		show_names.set_names.connect(self.set_names)
-
 		layout.addWidget(file_selection)
-		layout.addWidget(show_names)
 		layout.addWidget(dim_selection)
-		layout.addWidget(sat_num_selection)
-		layout.addWidget(radius_selection)
+		layout.addWidget(num_selection)
 		layout.addWidget(solve_button)
 
 
@@ -125,24 +113,19 @@ class DimSelectionWidget(QWidget):
 		self.threeD_button.setEnabled(not self.threeD)
 
 
-class NumWidget(QWidget):
-	def __init__(self, label, type=int):
+class SatNumWidget(QWidget):
+	def __init__(self):
 		super().__init__()
 
-		self.num = 0
-
-		self.type = type
+		self.sat_num = 0
 
 		self.setLayout(QHBoxLayout())
 
 		text = QLabel()
-		text.setText("%s:"%label)
+		text.setText("Number of satellites :")
 
 		num_field = QLineEdit()
-		if type is int:
-			num_field.setValidator(QIntValidator(0, 9999, self))
-		else:
-			num_field.setValidator(QDoubleValidator(0, 9999, 3, self))
+		num_field.setValidator(QIntValidator(0, 9999, self))
 		num_field.setText("0")
 		num_field.textEdited.connect(self.set_num)
 
@@ -150,24 +133,4 @@ class NumWidget(QWidget):
 		self.layout().addWidget(num_field)
 
 	def set_num(self, num):
-		self.num = self.type(num)
-
-
-class ShowNamesWidget(QWidget):
-
-	set_names = pyqtSignal(int)
-
-	def __init__(self):
-		super().__init__()
-
-		self.setLayout(QHBoxLayout())
-
-		text = QLabel()
-		text.setText("Show city names?")
-
-		box = QCheckBox()
-		box.stateChanged.connect(self.set_names)
-
-		self.layout().addWidget(text)
-		self.layout().addWidget(box)
-		
+		self.sat_num = int(num)
