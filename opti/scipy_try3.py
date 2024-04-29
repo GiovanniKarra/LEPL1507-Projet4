@@ -118,22 +118,22 @@ def opti(matrix, R, init,grid):
     print("Total population:", np.sum(matrix[:, 0]))
     print("Coverage percentage:", 100*tot_sol / np.sum(matrix[:, 0]), "%")
     print("initial solution:", 100*init_sol / np.sum(matrix[:, 0]), "%")
-    print("Satellite coordinates:", tot_sat_coords)
+    # print("Satellite coordinates:", tot_sat_coords)
 
 
     tot_sat_long = [elem[1] for elem in tot_sat_coords]
     tot_sat_lat = [elem[0] for elem in tot_sat_coords]
 
-    visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([tot_sat_long, tot_sat_lat, [1000]*len(tot_sat_long)]).T, [R]*nbr_sat, show_names=False)
+    # visualise_coverage_2D([("", elem[2], elem[1]) for elem in matrix], np.array([tot_sat_long, tot_sat_lat, [1000]*len(tot_sat_long)]).T, [R]*nbr_sat, show_names=False)
     return
 
 
 
 if __name__ == "__main__":
     # name = "geonames_be_smol.csv"
-    name = "geonames_be.csv"
+    # name = "geonames_be.csv"
     # name = "geonames_be_summarized.csv"
-    # name = "geonames_smol.csv"
+    name = "geonames_smol.csv"
     # name = "geonames_cleared.csv"
     
     name = "../"+name
@@ -144,7 +144,7 @@ if __name__ == "__main__":
 
     mat = df.to_numpy()
 
-    rayon = 40
+    rayon = 100
 
     # init = [11, 12, 13, 16, 17, 18]
     # cities, grid = calc_grid(name, 5, 5)
@@ -155,8 +155,8 @@ if __name__ == "__main__":
     # init = [112, 125, 130, 138, 156, 158]
     # cities, grid = calc_grid(name, 15, 15)
     
-    init = [190, 227, 234, 264, 269, 272]
-    cities, grid = calc_grid(name, 20, 20)
+    # init = [190, 227, 234, 264, 269, 272]
+    # cities, grid = calc_grid(name, 20, 20)
     
     # init = [465, 521, 531, 577, 618, 644]
     # cities, grid = calc_grid(name, 30, 30)
@@ -167,14 +167,14 @@ if __name__ == "__main__":
     # init = [1175, 1468, 1486, 1612, 1630, 1724]
     # cities, grid = calc_grid(name, 50, 50)
 
-    # init = [ 598,  926,  955, 2061, 2327, 2754, 3049, 3656, 3727, 3886, 3953, 4081, 4217, 4444,
-    #         4920, 5072, 5245, 5280, 5312, 5338, 5460, 5471, 5573, 5672, 5809, 5819, 5871, 6058,
-    #         6084, 6176, 6184, 6187, 6265, 6275, 6283, 6306, 6368, 6384, 6476, 6481, 6485, 6562,
-    #         6573, 6584, 6672, 6685, 6687, 6784, 6809, 6863, 6871, 6882, 6982, 6987, 7057, 7086,
-    #         7087, 7103, 7183, 7186, 7202, 7257, 7260, 7287, 7385, 7386, 7444, 7460, 7487, 7490,
-    #         7494, 7555, 7585, 7685, 7782, 7789, 7844, 7855, 7860, 7918, 7984, 7988, 8013, 8060,
-    #         8088, 8216, 8347, 8358, 8418, 8650, 8745, 8760, 8857, 9051, 9058, 9162, 9254, 9364,
-    #         9366, 9855]
-#     cities, grid = calc_grid(name, 100, 100)
+    init = [ 598,  926,  955, 2061, 2327, 2754, 3049, 3656, 3727, 3886, 3953, 4081, 4217, 4444,
+            4920, 5072, 5245, 5280, 5312, 5338, 5460, 5471, 5573, 5672, 5809, 5819, 5871, 6058,
+            6084, 6176, 6184, 6187, 6265, 6275, 6283, 6306, 6368, 6384, 6476, 6481, 6485, 6562,
+            6573, 6584, 6672, 6685, 6687, 6784, 6809, 6863, 6871, 6882, 6982, 6987, 7057, 7086,
+            7087, 7103, 7183, 7186, 7202, 7257, 7260, 7287, 7385, 7386, 7444, 7460, 7487, 7490,
+            7494, 7555, 7585, 7685, 7782, 7789, 7844, 7855, 7860, 7918, 7984, 7988, 8013, 8060,
+            8088, 8216, 8347, 8358, 8418, 8650, 8745, 8760, 8857, 9051, 9058, 9162, 9254, 9364,
+            9366, 9855]
+    cities, grid = calc_grid(name, 100, 100)
 
     opti(mat,rayon, init,grid)
