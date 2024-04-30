@@ -11,7 +11,7 @@ import time
 import models
 import add_func
 from scipy.optimize import minimize
-import coverage_visualisation as visu
+import visu_plot as visu
 
 
 def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_weights, grid_size=10000, h=1.2, radius_acceptable=0.200614975211322, verbose=False, visualise=False, zone=None):
@@ -48,7 +48,8 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
         lon_max = zone[3] 
         new_grid = []
         for i in range(len(grid)):
-            temp = pre.from_XYZ_to_lat_long(grid[i])
+            # temp = pre.from_XYZ_to_lat_long(grid[i])
+            temp = (np.rad2deg(np.arctan2(pos[2], np.sqrt(pos[0]**2 + pos[1]**2))), np.rad2deg(np.sign(pos[1])*np.arccos(pos[0]/(np.sqrt(pos[0]**2 + pos[1]**2)))))
             if lat_min > temp[0] or lat_max < temp[0] or lon_min > temp[1] or lon_max < temp[1]:
                 new_grid.append(grid[i]) 
         grid = np.array(new_grid)
@@ -178,7 +179,7 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
         print("Position:", tot_sat_coordsf)
 
     if visualise:
-        visu.visualise_coverage_3D(cities_coordinates, satellites_coordinates, radius_acceptable, use_cartesian=True, covered_ids=ids_villes)
+        visu.plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered)
     
     return tot_sat_coordsf, tot_sol
 
@@ -203,4 +204,4 @@ if __name__ == "__main__":
     cities_weights = data["size"].to_numpy()
     cities_coordinates_latlon = data[["lat", "long"]].to_numpy()
 
-    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, cities_coordinates_latlon, cities_weights)
+    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, cities_coordinates_latlon, cities_weights, visualise=True)
