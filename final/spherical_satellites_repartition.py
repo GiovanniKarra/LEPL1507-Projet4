@@ -14,7 +14,7 @@ from scipy.optimize import minimize
 import coverage_visualisation as visu
 
 
-def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_weights, grid_size=10000, h=1.2, radius_acceptable=0.201, verbose=False, zone=None):
+def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_weights, grid_size=10000, h=1.2, radius_acceptable=0.200614975211322, verbose=False, visualise=False):
     """
     Calcule sur la sphère la répartition des satellites optimale pour obtenir une couverture de population maximale.
 
@@ -76,16 +76,16 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
         print("Covered population:", covered_population_relative)
 
     ids_sat = np.array(np.where(save_x > 0.9))[0]
-    if verbose:
-        print("ID Satellites:", ids_sat)
+    # if verbose:
+    #     print("ID Satellites:", ids_sat)
 
     ids_villes = np.array(np.where(save_y > 0.9))[0]
-    if verbose:
-        print("ID Villes couvertes:", ids_villes)
+    # if verbose:
+    #     print("ID Villes couvertes:", ids_villes)
 
     satellites_coordinates = np.array([grid[i] for i in ids_sat])
-    if verbose:
-        print("Coords Satellites:\n", satellites_coordinates)
+    # if verbose:
+    #     print("Coords Satellites:\n", satellites_coordinates)
 
     weight = cities_weights
     lat = cities_coordinates[:, 0]
@@ -128,16 +128,15 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
         add_func.callback_function.iteration = 0  # Initialisation du compteur d'itérations
         add_func.callback_function.time = time.time()  # Initialisation du compteur de temps
         
-        # Optimisation
         result = initial_guess[2*i:2*(i+1)]
 
+        # Sélection des villes dans la zone de couverture du satellite
         zone = pd.DataFrame(full_data, columns=["population", "latitude", "longitude"])
-        # zone = zone[zone["latitude"].between(result[0]-R*(1/113)*(50/100),result[0]+R*(1/113)*(50/100))]
         zone = zone[zone["latitude"].between(result[0]-R/113,result[0]+R/113)]
-        # zone = zone[zone["longitude"].between(result[1]-R*(1/113)*(50/100),result[1]+R*(1/113)*(50/100))]
         zone = zone[zone["longitude"].between(result[1]-R/113,result[1]+R/113)]
         zone = zone.to_numpy()
 
+        # Optimisation de la position du satellite
         if verbose:
             result = minimize(add_func.objective_function, initial_guess[2*i:2*(i+1)], args=(zone, R)
                             , bounds=bounds
@@ -156,12 +155,17 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
 
     # Calcul de la couverture pour tous les satellites
     final_coverage = 0
+    id_covered = []
     for j in range(len(weight)):
         for i in range(len(initial_guess)//2):
             if add_func.distance(tot_sat_coords[i][0], tot_sat_coords[i][1], lat[j], lon[j]) <= R:
                 final_coverage += weight[j]
+                id_covered.append(j)
                 break
     tot_sol = final_coverage
+    
+    for i in range(len(id_covered)):
+        print("Ville", cities_weights[id_covered[i]])
 
     tot_sat_coordsf = [l.tolist() for l in tot_sat_coords]
 
@@ -173,22 +177,25 @@ def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_we
         print("initial solution:", 100*init_sol / np.sum(cities_weights), "%")
         print("Position:", tot_sat_coordsf)
 
-    # visu.visualise_coverage_3D(cities_coordinates, satellites_coordinates, radius_acceptable, use_cartesian=True, covered_ids=ids_villes)
+    if visualise:
+        visu.visualise_coverage_3D(cities_coordinates, satellites_coordinates, radius_acceptable, use_cartesian=True, covered_ids=ids_villes)
     
     return tot_sat_coordsf, tot_sol
 
 
-N_satellites = 10
+if __name__ == "__main__":
+    N_satellites = 1
 
-file = "../geonames_smol.csv"
-# file = "../geonames_be_smol.csv"
+    # file = "../geonames_smol.csv"
+    # file = "../geonames_be_smol.csv"
+    
 
-# Get cities coordinates and weights from .csv
-data = pd.read_csv(file, sep=";")
-cities_weights = data["Population"]           
+    # Get cities coordinates and weights from .csv
+    # data = pd.read_csv(file, sep=";")
+    # cities_weights = data["Population"]           
 
-lat = data["Coordinates"].str.split(",",expand=True)[0].astype(float)
-lon = data["Coordinates"].str.split(",",expand=True)[1].astype(float)
-cities_coordinates_latlon = np.array([lat,lon]).T
+    # lat = data["Coordinates"].str.split(",",expand=True)[0].astype(float)
+    # lon = data["Coordinates"].str.split(",",expand=True)[1].astype(float)
+    # cities_coordinates_latlon = np.array([lat,lon]).T
 
 satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, cities_coordinates_latlon, cities_weights)
