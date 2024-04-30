@@ -23,6 +23,7 @@ class Controls(QWidget):
 	file_selected = pyqtSignal(str)
 	solve = pyqtSignal(int, bool, float)  # num_de_satellites: int, 3D: bool
 	set_names = pyqtSignal(int)
+	toggled_threeD = pyqtSignal(bool)
 
 	def __init__(self):
 		super().__init__()
@@ -35,6 +36,7 @@ class Controls(QWidget):
 		file_selection.file_selected.connect(self.file_selected)
 
 		dim_selection = DimSelectionWidget()
+		dim_selection.toggled_threeD.connect(self.toggled_threeD)
 		dim_selection.setFixedWidth(120)
 
 		sat_num_selection = NumWidget("Number of satellites")
@@ -45,13 +47,16 @@ class Controls(QWidget):
 
 		solve_button = QPushButton("Run")
 		solve_button.pressed.connect(
-			lambda: self.solve.emit(sat_num_selection.num, dim_selection.threeD, radius_selection.num)
+			lambda:
+				self.solve.emit(sat_num_selection.num,
+								dim_selection.threeD,
+								radius_selection.num)
 		)
 		solve_button.setFixedWidth(50)
 
-		show_names = ShowNamesWidget()
+		show_names = CheckboxWidget("Show city names?")
 		show_names.setFixedWidth(200)
-		show_names.set_names.connect(self.set_names)
+		show_names.checked.connect(self.set_names)
 
 		layout.addWidget(file_selection)
 		layout.addWidget(show_names)
@@ -101,6 +106,8 @@ class FileSelectionWidget(QWidget):
 
 class DimSelectionWidget(QWidget):
 
+	toggled_threeD = pyqtSignal(bool)
+
 	def __init__(self):
 		super().__init__()
 
@@ -123,6 +130,8 @@ class DimSelectionWidget(QWidget):
 
 		self.twoD_button.setEnabled(self.threeD)
 		self.threeD_button.setEnabled(not self.threeD)
+
+		self.toggled_threeD.emit(self.threeD)
 
 
 class NumWidget(QWidget):
@@ -153,20 +162,20 @@ class NumWidget(QWidget):
 		self.num = self.type(num)
 
 
-class ShowNamesWidget(QWidget):
+class CheckboxWidget(QWidget):
 
-	set_names = pyqtSignal(int)
+	checked = pyqtSignal(int)
 
-	def __init__(self):
+	def __init__(self, label=""):
 		super().__init__()
 
 		self.setLayout(QHBoxLayout())
 
 		text = QLabel()
-		text.setText("Show city names?")
+		text.setText(label)
 
 		box = QCheckBox()
-		box.stateChanged.connect(self.set_names)
+		box.stateChanged.connect(self.checked)
 
 		self.layout().addWidget(text)
 		self.layout().addWidget(box)

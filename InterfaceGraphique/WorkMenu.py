@@ -32,6 +32,7 @@ class WorkMenu(QWidget):
 
 		left_widget.solve.connect(self.solve)
 		left_widget.set_names.connect(lambda x: self.file_selected(self.file, bool(x)))
+		left_widget.toggled_threeD.connect(self.right_widget.toggled_threeD)
 
 		layout.addWidget(left_widget)
 		layout.addWidget(self.right_widget)
