@@ -32,6 +32,7 @@ def basemodel(N_sat, N_grid, population, coverage):
 
     # N satellites
     contraintes.append(cp.sum(x) <= N_sat)
+    contraintes.append(1 <= cp.sum(x))
     
     # Couverture
     for i in range(N_cities):

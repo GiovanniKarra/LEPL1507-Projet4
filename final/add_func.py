@@ -27,3 +27,15 @@ def callback_function(xk):
     print("Time elapsed:", round(time.time() - callback_function.time, 5) , "s")
     print("-------------------------")
     callback_function.iteration += 1
+
+def cities_latlon_to_xyz(cities_coordinates_latlon):
+    n = len(cities_coordinates_latlon)
+    cities = np.zeros((n, 3))
+    for i in range(n):
+        lat = cities_coordinates_latlon[i][0]
+        lon = cities_coordinates_latlon[i][1]
+        x = math.cos(np.deg2rad(lat)) * math.cos(np.deg2rad(lon))
+        y = math.cos(np.deg2rad(lat)) * math.sin(np.deg2rad(lon))
+        z = math.sin(np.deg2rad(lat))
+        cities[i] = [x, y, z]
+    return cities
