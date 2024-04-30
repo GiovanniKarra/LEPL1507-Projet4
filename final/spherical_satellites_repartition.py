@@ -205,4 +205,4 @@ if __name__ == "__main__":
 
     file = "../exemple_data_sphere.csv"
 
-    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, cities_coordinates_latlon, cities_weights, visualise=True)
+    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, visualise=True)
