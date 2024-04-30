@@ -14,7 +14,7 @@ from scipy.optimize import minimize
 import coverage_visualisation as visu
 
 
-def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_weights, grid_size=10000, h=1.2, radius_acceptable=0.200614975211322, verbose=False, visualise=False):
+def spherical_satellites_repartition(N_satellites, cities_coordinates, cities_weights, grid_size=10000, h=1.2, radius_acceptable=0.200614975211322, verbose=False, visualise=False, zone=None):
     """
     Calcule sur la sphère la répartition des satellites optimale pour obtenir une couverture de population maximale.
 
@@ -198,4 +198,9 @@ if __name__ == "__main__":
     # lon = data["Coordinates"].str.split(",",expand=True)[1].astype(float)
     # cities_coordinates_latlon = np.array([lat,lon]).T
 
-satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, cities_coordinates_latlon, cities_weights)
+    file = "../exemple_data_sphere.csv"
+    data = pd.read_csv(file)
+    cities_weights = data["size"].to_numpy()
+    cities_coordinates_latlon = data[["lat", "long"]].to_numpy()
+
+    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, cities_coordinates_latlon, cities_weights)
