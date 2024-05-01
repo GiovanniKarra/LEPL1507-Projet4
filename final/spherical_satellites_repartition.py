@@ -137,8 +137,8 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
 
         # Sélection des villes dans la zone de couverture du satellite
         zone = pd.DataFrame(full_data, columns=["population", "latitude", "longitude"])
-        zone = zone[zone["latitude"].between(result[0]-R/113,result[0]+R/113)]
-        zone = zone[zone["longitude"].between(result[1]-R/113,result[1]+R/113)]
+        zone = zone[zone["latitude"].between(result[0]-2*R/113,result[0]+2*R/113)]
+        zone = zone[zone["longitude"].between(result[1]-2*R/113,result[1]+2*R/113)]
         zone = zone.to_numpy()
 
         # Optimisation de la position du satellite
@@ -168,9 +168,6 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
                 id_covered.append(j)
                 break
     tot_sol = final_coverage
-    
-    for i in range(len(id_covered)):
-        print("Ville", cities_weights[id_covered[i]])
 
     tot_sat_coordsf = [l.tolist() for l in tot_sat_coords]
 
@@ -189,20 +186,11 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
 
 
 if __name__ == "__main__":
-    N_satellites = 1
+    N_satellites = 100
 
-    # file = "../geonames_smol.csv"
-    # file = "../geonames_be_smol.csv"
-    
+    # file = "../test.csv"
+    file = "../refactored_smol.csv"
 
-    # Get cities coordinates and weights from .csv
-    # data = pd.read_csv(file, sep=";")
-    # cities_weights = data["Population"]           
-
-    # lat = data["Coordinates"].str.split(",",expand=True)[0].astype(float)
-    # lon = data["Coordinates"].str.split(",",expand=True)[1].astype(float)
-    # cities_coordinates_latlon = np.array([lat,lon]).T
-
-    file = "../exemple_data_sphere.csv"
-
-    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, visualise=True)
+    t0 = time.perf_counter()
+    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, verbose=True, visualise=True)
+    print("Time to solve:", time.perf_counter() - t0)   
