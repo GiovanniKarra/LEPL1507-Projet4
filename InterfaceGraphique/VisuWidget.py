@@ -5,7 +5,7 @@ import matplotlib.patches
 import numpy as np
 
 from matplotlib.backends.backend_qt5agg import (
-	FigureCanvasQTAgg, 
+	FigureCanvasQTAgg,
 	NavigationToolbar2QT
 )
 from matplotlib.figure import Figure
