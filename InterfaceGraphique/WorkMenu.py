@@ -27,9 +27,6 @@ class WorkMenu(QWidget):
 		left_widget = Controls()
 		self.right_widget = Visuals()
 
-		# left_widget.setFixedWidth(self.size().width())
-		# self.right_widget.setFixedWidth(self.size().width())
-
 		left_widget.solve.connect(self.solve)
 		left_widget.set_names.connect(lambda x: self.file_selected(self.file, bool(x)))
 		left_widget.toggled_threeD.connect(self.right_widget.toggled_threeD)

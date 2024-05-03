@@ -64,15 +64,12 @@ def solve3D(N_satellites, cities_coordinates, cities_weights, grid_size, radius,
 
 
 def get_cities(filename):
-	data : pd.DataFrame = pd.read_csv(filename, sep=";")
+	data : pd.DataFrame = pd.read_csv(filename)
 	cities = [None for _ in range(len(data))]
 
 	for i in range(len(data)):
 		y = float(data["lat"][i])
 		x = float(data["long"][i])
-		# y, x = tuple(map(float, data["Coordinates"][i].split(",")))
-		# weight = float(data["Population"][i])
-		# name = data["Name"][i]
 		weight = float(data["size"][i])
 		name = data["villeID"][i]
 

@@ -54,8 +54,11 @@ class Visuals(QWidget):
 		self.plot.axes.clear()
 
 		for i in range(len(self.cities)):
-			x, y, z = self.cities[i]
-			self.plot.axes.plot(x, y, z, "o", color="blue", alpha=0.6)
+			x, y, _, name = self.cities[i]
+			self.plot.axes.plot(x, y, "o", color="blue", alpha=0.6)
+
+			if self.show_names:
+				self.plot.axes.text(x, y, name)
 
 		indices_sat_positions = np.where(self.sat_pos[0] > 1-1e-3)[0]\
 											if len(self.sat_pos) > 0 else []
