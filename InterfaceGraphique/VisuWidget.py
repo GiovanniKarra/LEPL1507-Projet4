@@ -80,7 +80,7 @@ class Visuals(QWidget):
 		for lat, long in self.sat_pos:
 			self.plot.axes.plot(long, lat, "*", color="red", markersize=10)
 			
-			circle = matplotlib.patches.Circle((long, lat), self.radius, color='r', fill=False, linestyle="--", zorder=2)
+			circle = matplotlib.patches.Circle((long, lat), self.radius/113, color='r', fill=False, linestyle="--", zorder=2)
 			self.plot.axes.add_patch(circle)
 
 		self.plot.draw()

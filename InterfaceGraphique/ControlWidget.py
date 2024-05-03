@@ -21,7 +21,7 @@ from PyQt5.QtGui import (
 class Controls(QWidget):
 
 	file_selected = pyqtSignal(str)
-	solve = pyqtSignal(int, bool, float)  # num_de_satellites: int, 3D: bool
+	solve = pyqtSignal(int, bool, float, int)  # num_de_satellites: int, 3D: bool, radius: float, grid_size: int
 	set_names = pyqtSignal(int)
 	toggled_threeD = pyqtSignal(bool)
 
@@ -40,17 +40,21 @@ class Controls(QWidget):
 		dim_selection.setFixedWidth(120)
 
 		sat_num_selection = NumWidget("Number of satellites")
-		sat_num_selection.setFixedWidth(235)
+		# sat_num_selection.setFixedWidth(235)
 
-		radius_selection = NumWidget("Satellite radius", float)
-		radius_selection.setFixedWidth(200)
+		radius_selection = NumWidget("Satellite radius [km]", float)
+		# radius_selection.setFixedWidth(200)
+
+		gridsize_selection = NumWidget("Grid size")
+		# gridsize_selection.setFixedWidth(150)
 
 		solve_button = QPushButton("Run")
 		solve_button.pressed.connect(
 			lambda:
 				self.solve.emit(sat_num_selection.num,
 								dim_selection.threeD,
-								radius_selection.num)
+								radius_selection.num,
+								gridsize_selection.num)
 		)
 		solve_button.setFixedWidth(50)
 
@@ -63,6 +67,7 @@ class Controls(QWidget):
 		layout.addWidget(dim_selection)
 		layout.addWidget(sat_num_selection)
 		layout.addWidget(radius_selection)
+		layout.addWidget(gridsize_selection)
 		layout.addWidget(solve_button)
 
 
@@ -154,6 +159,7 @@ class NumWidget(QWidget):
 			num_field.setValidator(QDoubleValidator(0, 9999, 3, self))
 		num_field.setText("0")
 		num_field.textEdited.connect(self.set_num)
+		num_field.setFixedWidth(70)
 
 		self.layout().addWidget(text)
 		self.layout().addWidget(num_field)

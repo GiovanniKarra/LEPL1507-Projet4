@@ -9,8 +9,10 @@ from spherical_satellites_repartition import spherical_satellites_repartition
 
 
 def solve(filename, N_sat, radius, grid_size):
+	h = 1.2
+	radius_acceptable = np.sqrt((radius/6371)**2+(h-1)**2)
 	sat_pos, sol = spherical_satellites_repartition(N_sat, filename,
-								  grid_size=grid_size, radius_acceptable=radius,
+								  grid_size=grid_size, radius_acceptable=radius_acceptable,
 								  verbose=True)
 	
 	return sat_pos, sol

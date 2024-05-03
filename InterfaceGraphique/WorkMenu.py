@@ -4,7 +4,8 @@ sys.path.insert(1, "../opti/")
 from PyQt5.QtWidgets import (
 	QHBoxLayout,
 	QWidget,
-	QDialog
+	QDialog,
+	QLabel
 )
 from PyQt5.QtCore import (
 	pyqtSignal
@@ -26,6 +27,7 @@ class WorkMenu(QWidget):
 
 		left_widget = Controls()
 		self.right_widget = Visuals()
+		self.right_widget.setFixedWidth((self.right_widget.width()*3)//2)
 
 		left_widget.solve.connect(self.solve)
 		left_widget.set_names.connect(lambda x: self.file_selected(self.file, bool(x)))
@@ -49,12 +51,11 @@ class WorkMenu(QWidget):
 		else: self.right_widget.plot2D()
 
 
-	def solve(self, N_sat, threeD, radius):
+	def solve(self, N_sat, threeD, radius, grid_size):
 		self.right_widget.radius = radius
 
 		cities = get_cities(self.file)
-		weights = [city[2] for city in cities]
-		satellites, covered = solve(self.file, N_sat, radius, 30)
+		satellites, covered = solve(self.file, N_sat, radius, grid_size)
 
 		self.right_widget.sat_pos = satellites
 
