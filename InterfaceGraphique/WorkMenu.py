@@ -45,14 +45,26 @@ class WorkMenu(QWidget):
 		self.right_widget.grid = []
 		self.right_widget.show_names = show_names
 
-		self.right_widget.plot2D()
+		if self.right_widget.threeD: self.right_widget.plot3D()
+		else: self.right_widget.plot2D()
 
 
 	def solve(self, N_sat, threeD, radius):
+		self.right_widget.radius = radius
+
+		cities = get_cities(self.file)
+		weights = [city[2] for city in cities]
+		satellites, covered = solve(self.file, N_sat, radius, 30)
+
+		self.right_widget.sat_pos = satellites
+
+		if threeD: self.right_widget.plot3D()
+		else: self.right_widget.plot2D()
+		return
+
 		cities, satellites, grid = solve(self.file, N_sat, 1, (30, 30))
 
 		self.right_widget.sat_pos = satellites
 		self.right_widget.grid = grid
-		self.right_widget.radius = radius
 
 		self.right_widget.plot2D()
