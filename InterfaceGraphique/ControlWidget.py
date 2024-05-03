@@ -154,7 +154,7 @@ class NumWidget(QWidget):
 
 		num_field = QLineEdit()
 		if type is int:
-			num_field.setValidator(QIntValidator(0, 9999, self))
+			num_field.setValidator(QIntValidator(0, 999999, self))
 		else:
 			num_field.setValidator(QDoubleValidator(0, 9999, 3, self))
 		num_field.setText("0")

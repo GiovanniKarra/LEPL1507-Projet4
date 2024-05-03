@@ -54,7 +54,7 @@ class WorkMenu(QWidget):
 	def solve(self, N_sat, threeD, radius, grid_size):
 		self.right_widget.radius = radius
 
-		cities = get_cities(self.file)
+		# cities = get_cities(self.file)
 		satellites, covered = solve(self.file, N_sat, radius, grid_size)
 
 		self.right_widget.sat_pos = satellites
