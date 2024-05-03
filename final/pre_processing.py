@@ -23,7 +23,7 @@ import time
 
 # UTILISE
 def get_cities_old(file: str) -> np.ndarray:
-    data : pd.DataFrame = pd.read_csv(file, sep=";")
+    data : pd.DataFrame = pd.read_csv(file)
     cities = np.empty(len(data), dtype=np.ndarray)
 
     cities = np.zeros((len(data), 3))
@@ -31,10 +31,12 @@ def get_cities_old(file: str) -> np.ndarray:
 
 
     for i in range(len(cities)):
-        coor = data["Coordinates"][i].split(",")
-        lat = float(coor[0])
-        lon = float(coor[1])
-        weight =  float(data["Population"][i])
+        # coor = data["Coordinates"][i].split(",")
+        # lat = float(coor[0])
+        # lon = float(coor[1])
+        lat = float(data["lat"][i])
+        lon = float(data["long"][i])
+        weight = float(data["size"][i])
         x = math.cos(lat) * math.cos(lon)
         y = math.cos(lat) * math.sin(lon)
         z = math.sin(lat)
@@ -72,17 +74,20 @@ def calc_grid_3d(grid_size_X = 10, grid_size_Y = 10, h = 1.2) -> np.ndarray:
 
 
 def calc_grid(file: str, grid_size_X = 10, grid_size_Y = 10) -> np.ndarray:
-    data : pd.DataFrame = pd.read_csv(file, sep=";")
+    data : pd.DataFrame = pd.read_csv(file)
     cities = np.empty(len(data), dtype=tuple)
 
     maxX, maxY = -math.inf, -math.inf
     minX, minY = math.inf, math.inf
 
     for i in range(len(cities)):
-        coor = data["Coordinates"][i].split(",")
-        y  = float(coor[0])
-        x = float(coor[1])
-        weight =  float(data["Population"][i])
+        # coor = data["Coordinates"][i].split(",")
+        # y  = float(coor[0])
+        # x = float(coor[1])
+        y = float(data["lat"][i])
+        x = float(data["long"][i])
+        weight = float(data["size"][i])
+        # weight =  float(data["Population"][i])
 
         maxX = max(maxX, x)
         maxY = max(maxY, y)
@@ -109,9 +114,11 @@ def get_min_max(data: pd.DataFrame):
     minX, minY = math.inf, math.inf
     
     for i in range(len(data)):
-        coor = data["Coordinates"][i].split(",")
-        y = float(coor[0])
-        x = float(coor[1])
+        # coor = data["Coordinates"][i].split(",")
+        # y = float(coor[0])
+        # x = float(coor[1])
+        y = float(data["lat"][i])
+        x = float(data["long"][i])
 
         maxX = max(maxX, x)
         maxY = max(maxY, y)
@@ -130,7 +137,7 @@ def grid_avg(data: pd.DataFrame, grid_size_X = 300, grid_size_Y = 300):
     dx = x[1] - x[0]
     dy = y[1] - y[0]
 
-    for i, c in enumerate(data["Coordinates"]):
+    for i, c in enumerate("%s,%s"%(data["lat"], data["long"])):
         P = c.split(",")
         matrix[int((float(P[1]) - mx) // dx), int((float(P[0]) - my) // dy)] += float(data["Population"][i])
 
@@ -181,14 +188,17 @@ def calc_grid_3d(grid_size, h) -> np.ndarray:
 
 
 def get_cities(file):
-    data : pd.DataFrame = pd.read_csv(file, sep=";") 
+	data : pd.DataFrame = pd.read_csv(file)
+	cities = [None for _ in range(len(data))]
 
-    cities = np.empty((len(data),2))
-    for i in range(len(cities)):
-        split = data["Coordinates"][i].split(",")
-        cities[i,:] = [float(split[0]), float(split[1]), float(data["Population"][i])]
+	for i in range(len(data)):
+		y = float(data["lat"][i])
+		x = float(data["long"][i])
+		weight = float(data["size"][i])
 
-    return cities
+		cities[i] = (x, y, weight)
+
+	return cities
 
 #### RUN #### 
 
