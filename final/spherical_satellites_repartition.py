@@ -108,8 +108,10 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
     initial_guess = []
     for pos in satellites_coordinates:
         initial_guess.append(np.rad2deg(np.arctan2(pos[2], np.sqrt(pos[0]**2 + pos[1]**2))))
+        print(np.sign(pos[1]))
         initial_guess.append(np.rad2deg(np.sign(pos[1])*np.arccos(pos[0]/(np.sqrt(pos[0]**2 + pos[1]**2)))))
 
+    print("initial_guess:", initial_guess)
     init_coverage = 0
     for j in range(len(weight)):
         for i in range(len(initial_guess)//2):
@@ -137,8 +139,8 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
 
         # Sélection des villes dans la zone de couverture du satellite
         zone = pd.DataFrame(full_data, columns=["population", "latitude", "longitude"])
-        zone = zone[zone["latitude"].between(result[0]-2*R/113,result[0]+2*R/113)]
-        zone = zone[zone["longitude"].between(result[1]-2*R/113,result[1]+2*R/113)]
+        zone = zone[zone["latitude"].between(result[0]-R/113,result[0]+R/113)]
+        zone = zone[zone["longitude"].between(result[1]-R/113,result[1]+R/113)]
         zone = zone.to_numpy()
 
         # Optimisation de la position du satellite
@@ -189,7 +191,8 @@ if __name__ == "__main__":
     N_satellites = 100
 
     # file = "../test.csv"
-    file = "../refactored_smol.csv"
+    # file = "../refactored_smol.csv"
+    file = "../exemple_data_sphere.csv"
 
     t0 = time.perf_counter()
     satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, verbose=True, visualise=True)
