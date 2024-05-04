@@ -4,7 +4,7 @@ sys.path.insert(1, "../opti/")
 from PyQt5.QtWidgets import (
 	QHBoxLayout,
 	QWidget,
-	QDialog,
+	QMessageBox,
 	QLabel
 )
 from PyQt5.QtCore import (
@@ -40,15 +40,24 @@ class WorkMenu(QWidget):
 
 
 	def file_selected(self, filename, show_names=False):
-		self.file = filename
+		try:
+			self.file = filename
 
-		self.right_widget.cities = get_cities(filename)
-		self.right_widget.sat_pos = []
-		self.right_widget.grid = []
-		self.right_widget.show_names = show_names
+			self.right_widget.cities = get_cities(filename)
+			self.right_widget.sat_pos = []
+			self.right_widget.grid = []
+			self.right_widget.show_names = show_names
 
-		if self.right_widget.threeD: self.right_widget.plot3D()
-		else: self.right_widget.plot2D()
+			if self.right_widget.threeD: self.right_widget.plot3D()
+			else: self.right_widget.plot2D()
+		except FileNotFoundError:
+			diag = QMessageBox()
+			diag.setText("File not found: %s"%filename)
+			diag.exec()
+		except:
+			diag = QMessageBox()
+			diag.setText("File not compatible: %s"%filename)
+			diag.exec()
 
 
 	def solve(self, N_sat, threeD, radius, grid_size):
