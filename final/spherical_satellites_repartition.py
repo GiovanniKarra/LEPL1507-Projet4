@@ -46,17 +46,19 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
 	
     # Check if 'zone iterdite' is not None
     if zone is not None: # zone = (lat_min, lat_max, long_min, long_max)
-        lat_min = zone[0] 
-        lat_max = zone[1] 
-        lon_min = zone[2] 
-        lon_max = zone[3] 
-        new_grid = []
-        for i in range(len(grid)):
-            # temp = pre.from_XYZ_to_lat_long(grid[i])
-            temp = (np.rad2deg(np.arctan2(pos[2], np.sqrt(pos[0]**2 + pos[1]**2))), np.rad2deg(np.sign(pos[1])*np.arccos(pos[0]/(np.sqrt(pos[0]**2 + pos[1]**2)))))
-            if lat_min > temp[0] or lat_max < temp[0] or lon_min > temp[1] or lon_max < temp[1]:
-                new_grid.append(grid[i]) 
-        grid = np.array(new_grid)
+        for i in range(len(zone)):
+            new_grid = []
+            lat_min = zone[i][0] 
+            lat_max = zone[i][1] 
+            lon_min = zone[i][2] 
+            lon_max = zone[i][3] 
+            
+            for i in range(1,len(grid)):
+                # temp = pre.from_XYZ_to_lat_long(grid[i])
+                temp = (np.rad2deg(np.arctan2(grid[i][2], np.sqrt(grid[i][0]**2 + grid[i][1]**2))), np.rad2deg(np.sign(grid[i][1])*np.arccos(grid[i][0]/(np.sqrt(grid[i][0]**2 + grid[i][1]**2)))))
+                if lat_min > temp[0] or lat_max < temp[0] or lon_min > temp[1] or lon_max < temp[1]:
+                    new_grid.append(grid[i]) 
+            grid = np.array(new_grid)
 	    
     matrix_adj = pre.calc_adj(cities_xyz, grid, radius_acceptable)
     if verbose:
@@ -81,6 +83,8 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
         print("Covered population:", covered_population_relative)
 
     ids_sat = np.array(np.where(save_x > 0.9))[0]
+    if 0 in ids_sat:
+        ids_sat = ids_sat[1:]
     # if verbose:
     #     print("ID Satellites:", ids_sat)
 
@@ -108,10 +112,8 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
     initial_guess = []
     for pos in satellites_coordinates:
         initial_guess.append(np.rad2deg(np.arctan2(pos[2], np.sqrt(pos[0]**2 + pos[1]**2))))
-        print(np.sign(pos[1]))
         initial_guess.append(np.rad2deg(np.sign(pos[1])*np.arccos(pos[0]/(np.sqrt(pos[0]**2 + pos[1]**2)))))
 
-    print("initial_guess:", initial_guess)
     init_coverage = 0
     for j in range(len(weight)):
         for i in range(len(initial_guess)//2):
@@ -138,19 +140,19 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
         result = initial_guess[2*i:2*(i+1)]
 
         # Sélection des villes dans la zone de couverture du satellite
-        zone = pd.DataFrame(full_data, columns=["population", "latitude", "longitude"])
-        zone = zone[zone["latitude"].between(result[0]-R/113,result[0]+R/113)]
-        zone = zone[zone["longitude"].between(result[1]-R/113,result[1]+R/113)]
-        zone = zone.to_numpy()
+        zone_know = pd.DataFrame(full_data, columns=["population", "latitude", "longitude"])
+        zone_know = zone_know[zone_know["latitude"].between(result[0]-R/113,result[0]+R/113)]
+        zone_know = zone_know[zone_know["longitude"].between(result[1]-R/113,result[1]+R/113)]
+        zone_know = zone_know.to_numpy()
 
         # Optimisation de la position du satellite
         if verbose:
-            result = minimize(add_func.objective_function, initial_guess[2*i:2*(i+1)], args=(zone, R)
+            result = minimize(add_func.objective_function, initial_guess[2*i:2*(i+1)], args=(zone_know, R)
                             , bounds=bounds
                             , callback=add_func.callback_function
                     )
         else:
-            result = minimize(add_func.objective_function, initial_guess[2*i:2*(i+1)], args=(zone, R)
+            result = minimize(add_func.objective_function, initial_guess[2*i:2*(i+1)], args=(zone_know, R)
                             , bounds=bounds
                     )
         
@@ -182,18 +184,26 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
         print("Position:", tot_sat_coordsf)
 
     if visualise:
-        visu.plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered)
+        visu.plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered,zone=zone)
     
     return tot_sat_coordsf, tot_sol
 
 
 if __name__ == "__main__":
-    N_satellites = 100
+    N_satellites = 10
 
-    # file = "../test.csv"
+    file = "../test.csv"
     # file = "../refactored_smol.csv"
-    file = "../exemple_data_sphere.csv"
+    # file = "../exemple_data_sphere.csv"
+    
+    # zone = (lat_min, lat_max, long_min, long_max)
+    ZI = [(0,50,105,150),(30,55,10,100)]
 
     t0 = time.perf_counter()
-    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, verbose=True, visualise=True)
+    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, 
+                                                                                #   grid_size=10000,
+                                                                                #   verbose=True,
+                                                                                  visualise=True,
+                                                                                  zone=ZI,
+                                                                                  )
     print("Time to solve:", time.perf_counter() - t0)   

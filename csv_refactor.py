@@ -20,14 +20,15 @@ def el_coupe_coupe(file, min_lat, max_lat, min_lon, max_lon):
     data = pd.read_csv(file)
     new_data = data[data["lat"].between(min_lat, max_lat)]
     new_data = new_data[new_data["long"].between(min_lon, max_lon)]
-    new_data.drop(new_data[new_data["size"] < 5000].index, inplace=True)
+    new_data.drop(new_data[new_data["size"] < 10000].index, inplace=True)
     print(len(new_data))
-    # new_data.to_csv("../test.csv")
+    new_data.to_csv("../test.csv")
+    # new_data.to_csv("../Asie_1k.csv")
 
 if __name__ == "__main__":
     
     file = "../refactored_cleared.csv"
 
-    el_coupe_coupe(file, 15, 70, -137, -50)
+    el_coupe_coupe(file, -10, 75, 50, 180)
     
 

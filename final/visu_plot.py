@@ -36,7 +36,7 @@ def plannar_2D_visu2(file_cities, statelites, coverred_id=None, radius=1000):
 
 
 
-def plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered):
+def plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered,zone=None):
 
     covered_citites = []
 
@@ -61,56 +61,39 @@ def plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered):
     fig2 = px.scatter_geo(df_covered, lat="lat", lon="lon", projection="natural earth", color='color')
     fig3 = px.scatter_geo(df_sat, lat="lat", lon="lon", projection="natural earth", size='size')
 
-
     fig = px.scatter_geo()
     fig.add_traces(fig1._data)
     fig.add_traces(fig2._data)
     fig.add_traces(fig3._data)
 
+    if zone is not None:
+        print(zone)
+        
+        for i in range(len(zone)):
+            lats = []
+            lons = []
+        
+            lats.append(zone[i][0])
+            lons.append(zone[i][2])
+            
+            lats.append(zone[i][0])
+            lons.append(zone[i][3])
+            
+            lats.append(zone[i][1])
+            lons.append(zone[i][3])
+            
+            lats.append(zone[i][1])
+            lons.append(zone[i][2])
+            
+            lats.append(zone[i][0])
+            lons.append(zone[i][2])
+            
+            fig_z = px.line_geo(lat=lats, lon=lons, projection="natural earth")
+            fig.add_traces(fig_z._data)
 
     fig.show()
 
 
 
 if __name__ == "__main__":
-
-    file = "geonames_smol.csv"
-
-    # df = pd.read_csv(file, delimiter=";")
-
-    # lat = []
-    # long = []
-    # color_red = [1] * len(df)
-
-    # print(color_red)
-
-    # for i in range(len(df)):
-    #     split = df["Coordinates"][i].split(",")
-    #     lat.append(float(split[0]))
-    #     long.append(float(split[1]))
-
-    # df.insert(3, "lat", lat, True)
-    # df.insert(4, "lon", long, True)
-    # df.insert(5, "color", color_red, True)
-
-
-    # print(df)
-
-    # data = {'lat': [50.8476],
-    #         'lon': [4.3572],
-    #         'radius': [1000]}
-
-    # fig1 = px.scatter_geo(df, lat="lat", lon="lon", projection="natural earth", color="Population")
-    # fig2 = px.scatter_geo(data, lat="lat", lon="lon", size="radius", projection="natural earth" )
-
-    # fig = px.scatter_geo()
-    # fig.add_traces(fig1._data)
-    # fig.add_traces(fig2._data)
-
-
-    sat = [[50.8476, 4.3572]]
-
-    fig =  plannar_2D_visu2(file, sat)
-
-
-    fig.show()
+    pass
