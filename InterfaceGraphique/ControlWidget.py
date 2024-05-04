@@ -21,7 +21,7 @@ from PyQt5.QtGui import (
 class Controls(QWidget):
 
 	file_selected = pyqtSignal(str)
-	solve = pyqtSignal(int, bool, float, int)  # num_de_satellites: int, 3D: bool, radius: float, grid_size: int
+	solve = pyqtSignal(int, bool, float, int, bool)  # num_de_satellites: int, 3D: bool, radius: float, grid_size: int, visu: bool
 	set_names = pyqtSignal(int)
 	toggled_threeD = pyqtSignal(bool)
 
@@ -37,16 +37,21 @@ class Controls(QWidget):
 
 		dim_selection = DimSelectionWidget()
 		dim_selection.toggled_threeD.connect(self.toggled_threeD)
-		dim_selection.setFixedWidth(120)
+		# dim_selection.setFixedWidth(120)
 
 		sat_num_selection = NumWidget("Number of satellites")
-		# sat_num_selection.setFixedWidth(235)
 
 		radius_selection = NumWidget("Satellite radius [km]", float)
-		# radius_selection.setFixedWidth(200)
 
 		gridsize_selection = NumWidget("Grid size")
-		# gridsize_selection.setFixedWidth(150)
+
+
+		show_names = CheckboxWidget("Show city names?")
+		# show_names.setFixedWidth(200)
+		show_names.checked.connect(self.set_names)
+
+		plotly_visu = CheckboxWidget("Show plotly visualisation\nin browser?")
+		# plotly_visu.setFixedWidth(200)
 
 		solve_button = QPushButton("Run")
 		solve_button.pressed.connect(
@@ -54,14 +59,11 @@ class Controls(QWidget):
 				self.solve.emit(sat_num_selection.num,
 								dim_selection.threeD,
 								radius_selection.num,
-								gridsize_selection.num)
+								gridsize_selection.num,
+								plotly_visu.val)
 		)
-		solve_button.setFixedWidth(50)
-
-		show_names = CheckboxWidget("Show city names?")
-		show_names.setFixedWidth(200)
-		show_names.checked.connect(self.set_names)
-
+		# solve_button.setFixedWidth(50)
+  
 		layout.addWidget(file_selection)
 		layout.addWidget(show_names)
 		layout.addWidget(dim_selection)
@@ -69,6 +71,7 @@ class Controls(QWidget):
 		layout.addWidget(radius_selection)
 		layout.addWidget(gridsize_selection)
 		layout.addWidget(solve_button)
+		layout.addWidget(plotly_visu)
 
 
 class FileSelectionWidget(QWidget):
@@ -178,6 +181,8 @@ class CheckboxWidget(QWidget):
 	def __init__(self, label=""):
 		super().__init__()
 
+		self.val = False
+
 		self.setLayout(QHBoxLayout())
 
 		text = QLabel()
@@ -185,7 +190,11 @@ class CheckboxWidget(QWidget):
 
 		box = QCheckBox()
 		box.stateChanged.connect(self.checked)
+		box.stateChanged.connect(self.set_val)
 
 		self.layout().addWidget(text)
 		self.layout().addWidget(box)
-		
+
+	
+	def set_val(self, val):
+		self.val = bool(val)

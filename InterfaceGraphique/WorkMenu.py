@@ -51,30 +51,19 @@ class WorkMenu(QWidget):
 			if self.right_widget.threeD: self.right_widget.plot3D()
 			else: self.right_widget.plot2D()
 		except FileNotFoundError:
-			diag = QMessageBox()
-			diag.setText("File not found: %s"%filename)
-			diag.exec()
+			pass
 		except:
 			diag = QMessageBox()
 			diag.setText("File not compatible: %s"%filename)
 			diag.exec()
 
 
-	def solve(self, N_sat, threeD, radius, grid_size):
+	def solve(self, N_sat, threeD, radius, grid_size, visu=False):
 		self.right_widget.radius = radius
 
-		# cities = get_cities(self.file)
-		satellites, covered = solve(self.file, N_sat, radius, grid_size)
+		satellites, covered = solve(self.file, N_sat, radius, grid_size, visu)
 
 		self.right_widget.sat_pos = satellites
 
 		if threeD: self.right_widget.plot3D()
 		else: self.right_widget.plot2D()
-		return
-
-		cities, satellites, grid = solve(self.file, N_sat, 1, (30, 30))
-
-		self.right_widget.sat_pos = satellites
-		self.right_widget.grid = grid
-
-		self.right_widget.plot2D()
