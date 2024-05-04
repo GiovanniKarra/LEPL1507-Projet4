@@ -73,39 +73,31 @@ def calc_grid_3d(grid_size_X = 10, grid_size_Y = 10, h = 1.2) -> np.ndarray:
 
 
 
-def calc_grid(file: str, grid_size_X = 10, grid_size_Y = 10) -> np.ndarray:
-    data : pd.DataFrame = pd.read_csv(file)
-    cities = np.empty(len(data), dtype=tuple)
+def calc_grid(cities_coordinates, grid_size_X = 10, grid_size_Y = 10) -> np.ndarray:
 
     maxX, maxY = -math.inf, -math.inf
     minX, minY = math.inf, math.inf
 
-    for i in range(len(cities)):
-        # coor = data["Coordinates"][i].split(",")
-        # y  = float(coor[0])
-        # x = float(coor[1])
-        y = float(data["lat"][i])
-        x = float(data["long"][i])
-        weight = float(data["size"][i])
-        # weight =  float(data["Population"][i])
+    for i in range(len(cities_coordinates)):
+
+        y = cities_coordinates[i][0]
+        x = cities_coordinates[i][1]
 
         maxX = max(maxX, x)
         maxY = max(maxY, y)
         minX = min(minX, x)
         minY = min(minY, y)
 
-        cities[i] = (x, y, weight)
-
     grid = np.empty(grid_size_Y * grid_size_X, dtype=tuple).reshape(grid_size_Y, grid_size_X)
 
-    x = np.linspace(np.floor(minX), np.ceil(maxX), grid_size_X)
-    y = np.linspace(np.floor(minY), np.ceil(maxY), grid_size_Y)
+    x = np.linspace(minX, np.ceil(maxX), grid_size_X)
+    y = np.linspace(minY, np.ceil(maxY), grid_size_Y)
     
     for i in enumerate(x):
         for j in enumerate(y):
             grid[j[0]][i[0]] = tuple((x[i[0]], y[j[0]]))
 
-    return cities, grid
+    return grid
 
 
 def get_min_max(data: pd.DataFrame):
@@ -163,7 +155,6 @@ def calc_adj(cities, grid: np.ndarray, radius: float, h=0.2):
 # UTILISE
 def calc_adj(cities, grid: np.ndarray, radius: float):
     matrix_adj = np.empty(len(cities), dtype=np.ndarray)
-
     dist = distance.cdist(cities, grid)
     # dist =  np.where(dist[0] <= radius, dist[0], 0)
 
@@ -183,7 +174,23 @@ def calc_grid_3d(grid_size, h) -> np.ndarray:
     grid = np.array([h * np.cos(theta) * np.sin(phi),
             h * np.sin(theta) * np.sin(phi),
             h * np.cos(phi)]).T
+    return grid
 
+
+# UTILISE
+def calc_grid_2d(grid_size, cities_coordinates) -> np.ndarray:
+    n = grid_size
+    goldenRatio = (1 + 5**0.5) / 2
+    i = np.arange(0, n)
+    x = (i / goldenRatio) % 1
+    y = i / (n-1)
+    maxLat = np.max(cities_coordinates[:,0])
+    minLat = np.min(cities_coordinates[:,0])
+    lenLat = maxLat - minLat
+    maxLon = np.max(cities_coordinates[:,1])
+    minLon = np.min(cities_coordinates[:,1])
+    lenLon = maxLon - minLon
+    grid = np.array([x*lenLat + minLat, y*lenLon + minLon]).T
     return grid
 
 
