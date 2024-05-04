@@ -165,7 +165,10 @@ class NumWidget(QWidget):
 		self.layout().addWidget(num_field)
 
 	def set_num(self, num):
-		self.num = self.type(num)
+		try:
+			self.num = self.type(num)
+		except:
+			return
 
 
 class CheckboxWidget(QWidget):
