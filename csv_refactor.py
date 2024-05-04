@@ -17,13 +17,13 @@ def refactorisator(file):
     new_df.to_csv(new_name)
 
 def el_coupe_coupe(file, min_lat, max_lat, min_lon, max_lon):
-    data = pd.read_csv(file)
-    new_data = data[data["lat"].between(min_lat, max_lat)]
-    new_data = new_data[new_data["long"].between(min_lon, max_lon)]
-    new_data.drop(new_data[new_data["size"] < 10000].index, inplace=True)
+    new_data = pd.read_csv(file)
+    # new_data = data[data["lat"].between(min_lat, max_lat)]
+    # new_data = new_data[new_data["long"].between(min_lon, max_lon)]
+    new_data.drop(new_data[new_data["size"] < 50000].index, inplace=True)
     print(len(new_data))
     new_data.to_csv("../test.csv")
-    # new_data.to_csv("../Asie_1k.csv")
+    new_data.to_csv("../World_50k.csv")
 
 if __name__ == "__main__":
     

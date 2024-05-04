@@ -190,11 +190,11 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
     if visualise:
         visu.plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered,zone=zone)
     
-    return tot_sat_coordsf, tot_sol
+    return tot_sat_coordsf, tot_sol, problem.value
 
 
 if __name__ == "__main__":
-    N_satellites = 100
+    N_satellites = 200
 
     file = "../test.csv"
     file = "../refactored_smol.csv"
@@ -206,7 +206,7 @@ if __name__ == "__main__":
 
     t0 = time.perf_counter()
     satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, 
-                                                                                  grid_size=100,
+                                                                                #   grid_size=10000,
                                                                                   verbose=True,
                                                                                   visualise=True,
                                                                                 #   zone=ZI,
