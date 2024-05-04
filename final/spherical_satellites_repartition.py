@@ -21,16 +21,20 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
     Arguments:
     ---------
     N_satellites:       nombre de satellites à répartir
-    cities_coordinates: coordonnées des villes
-    cities_weights:     poids de chaque ville
+    file:               chemin vers le fichier à traiter
 	grid_size:          nombre de points dans le grid (par défaut 1000)
 	h:                  hauteur des satellites (par défaut 1.2x le rayon de la Terre)
 	radius_acceptable:  rayon autour des satellites à partir duquel l'intensité est jugée acceptable
+                        [!] valeur normalisée par rapport au rayon de la Terre = 1. doit être > h-1
+                        par exemple, un rayon au sol d=100km correspond à r=0.200614975211322 (valeur par défaut)
+    verbose:            outil de débogage
+    visualise:          outil de visualisation
+    zone:               liste de zones interdites au format (lat_min, lat_max, long_min, long_max)
     
     Returns:
     --------
-    satellites_coordinates: coordonnées des satellites placés.
-	covered_population: population couverte
+    satellites_coordinates:     coordonnées des satellites placés
+	covered_population:         population couverte
     """
 
     data = pd.read_csv(file)
