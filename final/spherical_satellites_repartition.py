@@ -195,6 +195,7 @@ if __name__ == "__main__":
     file = "../test.csv"
     # file = "../refactored_smol.csv"
     # file = "../exemple_data_sphere.csv"
+    file = "../Afrique_10k.csv"
     
     # zone = (lat_min, lat_max, long_min, long_max)
     ZI = [(0,50,105,150),(30,55,10,100)]

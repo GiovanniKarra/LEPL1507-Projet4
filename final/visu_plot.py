@@ -67,26 +67,26 @@ def plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered,zone=None):
     fig.add_traces(fig3._data)
 
     if zone is not None:
-        print(zone)
-        
         for i in range(len(zone)):
             lats = []
             lons = []
-        
-            lats.append(zone[i][0])
-            lons.append(zone[i][2])
+
+            for j in range(zone[i][2],zone[i][3]+1):
+                lats.append(zone[i][0])
+                lons.append(j)
+                
+            for j in range(zone[i][0],zone[i][1]+1):
+                lats.append(j)
+                lons.append(zone[i][3])
             
-            lats.append(zone[i][0])
-            lons.append(zone[i][3])
-            
-            lats.append(zone[i][1])
-            lons.append(zone[i][3])
-            
-            lats.append(zone[i][1])
-            lons.append(zone[i][2])
-            
-            lats.append(zone[i][0])
-            lons.append(zone[i][2])
+            for j in range(zone[i][3],zone[i][2]-1,-1):
+                lats.append(zone[i][1])
+                lons.append(j)
+                
+            for j in range(zone[i][1],zone[i][0]-1,-1):
+                lats.append(j)
+                lons.append(zone[i][2])
+                
             
             fig_z = px.line_geo(lat=lats, lon=lons, projection="natural earth")
             fig.add_traces(fig_z._data)
