@@ -60,7 +60,7 @@ def grid_couv():
     sols_cont = []
     sols_disc = []
     delta = []
-    grid = np.logspace(1,3.8,num=30,dtype=int)
+    grid = np.logspace(2,4.3,num=30,dtype=int)
     
     for i in range(len(grid)):
         print("#"*20)
