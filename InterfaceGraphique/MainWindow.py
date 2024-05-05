@@ -5,7 +5,13 @@ from PyQt5.QtWidgets import (
 	QMainWindow,
 	QFileDialog,
 	QMenuBar,
-	QWidget
+	QDialog,
+	QLabel,
+	QVBoxLayout,
+	QPushButton
+)
+from PyQt5.QtGui import (
+	QPixmap
 )
 
 from MainMenu import MainMenu
@@ -29,7 +35,7 @@ class MainWindow(QMainWindow):
 		file_menu.addAction("create 'cities' file", self.create_cities)
 		file_menu.addAction("create 'forbidden zones' file", self.create_zones)
 
-		menubar.addMenu("Help")
+		menubar.addAction("Help", self.show_tuto)
 
 		self.setCentralWidget(mainmenu)
 		self.setMenuBar(menubar)
@@ -58,3 +64,21 @@ class MainWindow(QMainWindow):
 
 	def create_zones(self):
 		self.create_csv_file("lat_min,lat_max,long_min,long_max")
+
+
+	def show_tuto(self):
+		diag = QDialog()
+		diag.setLayout(QVBoxLayout())
+
+		image = QPixmap("images/Tuto.png").scaled(1025, 633)
+
+		label = QLabel()
+		label.setPixmap(image)
+
+		ok_button = QPushButton("OK")
+		ok_button.pressed.connect(diag.close)
+
+		diag.layout().addWidget(label)
+		diag.layout().addWidget(ok_button)
+
+		diag.exec()
