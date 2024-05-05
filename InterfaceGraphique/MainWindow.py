@@ -1,12 +1,11 @@
 from PyQt5.QtCore import (
-	QSize,
-	Qt
+	QSize
 )
 from PyQt5.QtWidgets import (
 	QMainWindow,
-)
-from PyQt5.QtGui import (
-	QMovie
+	QFileDialog,
+	QMenuBar,
+	QWidget
 )
 
 from MainMenu import MainMenu
@@ -24,7 +23,38 @@ class MainWindow(QMainWindow):
 		mainmenu.start.connect(self.goto_work)
 		mainmenu.quit.connect(self.close)
 
+		menubar = QMenuBar()
+
+		file_menu = menubar.addMenu("File")
+		file_menu.addAction("create 'cities' file", self.create_cities)
+		file_menu.addAction("create 'forbidden zones' file", self.create_zones)
+
+		menubar.addMenu("Help")
+
 		self.setCentralWidget(mainmenu)
+		self.setMenuBar(menubar)
 
 	def goto_work(self):
 		self.setCentralWidget(WorkMenu())
+
+
+	def create_csv_file(self, header):
+		diag = QFileDialog()
+
+		path, _ = diag.getSaveFileName(filter="'Comma Separated Values' files (*.csv)")
+
+		if len(path) == 0: return
+
+		if path[-4:] != ".csv":
+			path += ".csv"
+
+		with open(path, "w") as f:
+			f.write(header)
+
+	
+	def create_cities(self):
+		self.create_csv_file("villeID,size,lat,long")
+
+
+	def create_zones(self):
+		self.create_csv_file("lat_min,lat_max,long_min,long_max")

@@ -15,11 +15,7 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtWidgets import (
 	QWidget,
-	QVBoxLayout,
-	QPushButton
-)
-from PyQt5.QtGui import (
-	QPixmap
+	QVBoxLayout
 )
 
 from solver import index_to_grid, xyz_to_coord, coord_to_xyz
