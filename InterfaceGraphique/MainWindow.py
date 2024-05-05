@@ -11,7 +11,8 @@ from PyQt5.QtWidgets import (
 	QPushButton
 )
 from PyQt5.QtGui import (
-	QPixmap
+	QPixmap,
+	QMovie
 )
 
 from MainMenu import MainMenu
@@ -37,6 +38,11 @@ class MainWindow(QMainWindow):
 		file_menu.addAction("quit", self.close)
 
 		menubar.addAction("Help", self.show_tuto)
+
+		about_menu = menubar.addMenu("About")
+
+		about_menu.addAction("1315", self.show_1315)
+		about_menu.addAction("Newton-Raphson", self.show_nf)
 
 		self.setCentralWidget(mainmenu)
 		self.setMenuBar(menubar)
@@ -72,6 +78,43 @@ class MainWindow(QMainWindow):
 		diag.setLayout(QVBoxLayout())
 
 		image = QPixmap("images/Tuto.png").scaled(1025, 633)
+
+		label = QLabel()
+		label.setPixmap(image)
+
+		ok_button = QPushButton("OK")
+		ok_button.pressed.connect(diag.close)
+
+		diag.layout().addWidget(label)
+		diag.layout().addWidget(ok_button)
+
+		diag.exec()
+
+
+	def show_nf(self):
+		diag = QDialog()
+		diag.setLayout(QVBoxLayout())
+
+		gif = QMovie("images/NewtonRaphson.gif")
+
+		label = QLabel()
+		label.setMovie(gif)
+		gif.start()
+
+		ok_button = QPushButton("OK")
+		ok_button.pressed.connect(diag.close)
+
+		diag.layout().addWidget(label)
+		diag.layout().addWidget(ok_button)
+
+		diag.exec()
+
+
+	def show_1315(self):
+		diag = QDialog()
+		diag.setLayout(QVBoxLayout())
+
+		image = QPixmap("images/ComplAnal.png")
 
 		label = QLabel()
 		label.setPixmap(image)
