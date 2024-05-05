@@ -58,10 +58,10 @@ class WorkMenu(QWidget):
 			diag.exec()
 
 
-	def solve(self, N_sat, threeD, radius, grid_size, visu=False):
+	def solve(self, N_sat, threeD, radius, grid_size, zones_file, visu=False):
 		self.right_widget.radius = radius
 
-		satellites, covered = solve(self.file, N_sat, radius, grid_size, visu)
+		satellites, covered = solve(self.file, N_sat, radius, grid_size, zones_file, visu)
 
 		self.right_widget.sat_pos = satellites
 

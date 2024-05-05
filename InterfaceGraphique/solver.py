@@ -8,14 +8,23 @@ import pre_processing
 from spherical_satellites_repartition import spherical_satellites_repartition
 
 
-def solve(filename, N_sat, radius, grid_size, visu=False):
+def solve(filename, N_sat, radius, grid_size, zones_file, visu=False):
 	h = 1.2
 	radius_acceptable = np.sqrt((radius/6371)**2+(h-1)**2)
 	sat_pos, sol = spherical_satellites_repartition(N_sat, filename,
 								  grid_size=grid_size, radius_acceptable=radius_acceptable,
-								  verbose=True, visualise=visu)
+								  verbose=True, visualise=visu, zone=get_zones(zones_file))
 	
 	return sat_pos, sol
+
+
+def get_zones(filename):
+	data = pd.read_csv(filename)
+	N = len(data)
+
+	ret = list(data.itertuples(index=False, name=None))
+
+	return ret
 
 
 def get_cities(filename):

@@ -21,7 +21,10 @@ from PyQt5.QtGui import (
 class Controls(QWidget):
 
 	file_selected = pyqtSignal(str)
-	solve = pyqtSignal(int, bool, float, int, bool)  # num_de_satellites: int, 3D: bool, radius: float, grid_size: int, visu: bool
+
+	# num_de_satellites: int, 3D: bool, radius: float, grid_size: int, zones_file: str, visu: bool
+	solve = pyqtSignal(int, bool, float, int, str, bool)
+	
 	set_names = pyqtSignal(int)
 	toggled_threeD = pyqtSignal(bool)
 
@@ -34,6 +37,8 @@ class Controls(QWidget):
 		
 		file_selection = FileSelectionWidget(title="Select input file")
 		file_selection.file_selected.connect(self.file_selected)
+
+		zones_selection = FileSelectionWidget(title="Select forbidden\nzones file")
 
 		dim_selection = DimSelectionWidget()
 		dim_selection.toggled_threeD.connect(self.toggled_threeD)
@@ -60,11 +65,13 @@ class Controls(QWidget):
 								dim_selection.threeD,
 								radius_selection.num,
 								gridsize_selection.num,
+								zones_selection.file_name.text(),
 								plotly_visu.val)
 		)
 		# solve_button.setFixedWidth(50)
   
 		layout.addWidget(file_selection)
+		layout.addWidget(zones_selection)
 		layout.addWidget(show_names)
 		layout.addWidget(dim_selection)
 		layout.addWidget(sat_num_selection)
