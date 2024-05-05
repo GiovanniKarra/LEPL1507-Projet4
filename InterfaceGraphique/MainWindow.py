@@ -34,6 +34,7 @@ class MainWindow(QMainWindow):
 		file_menu = menubar.addMenu("File")
 		file_menu.addAction("create 'cities' file", self.create_cities)
 		file_menu.addAction("create 'forbidden zones' file", self.create_zones)
+		file_menu.addAction("quit", self.close)
 
 		menubar.addAction("Help", self.show_tuto)
 
