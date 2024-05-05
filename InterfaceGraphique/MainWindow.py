@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
 		about_menu = menubar.addMenu("About")
 
 		about_menu.addAction("1315", self.show_1315)
-		about_menu.addAction("Newton-Raphson", self.show_nf)
+		about_menu.addAction("Newton-Raphson", self.show_nr)
 
 		self.setCentralWidget(mainmenu)
 		self.setMenuBar(menubar)
@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
 		diag.exec()
 
 
-	def show_nf(self):
+	def show_nr(self):
 		diag = QDialog()
 		diag.setLayout(QVBoxLayout())
 
