@@ -11,6 +11,7 @@ from spherical_satellites_repartition import spherical_satellites_repartition
 def solve(filename, N_sat, radius, grid_size, zones_file, visu=False):
 	h = 1.2
 	radius_acceptable = np.sqrt((radius/6371)**2+(h-1)**2)
+	print(f"{radius_acceptable = }\n{filename = }\n{grid_size = }\n{N_sat = }")
 	sat_pos, sol = spherical_satellites_repartition(N_sat, filename,
 								  grid_size=grid_size, radius_acceptable=radius_acceptable,
 								  verbose=True, visualise=visu, zone=get_zones(zones_file))

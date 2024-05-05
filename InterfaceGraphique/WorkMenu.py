@@ -58,19 +58,20 @@ class WorkMenu(QWidget):
 
 
 	def solve(self, N_sat, threeD, radius, grid_size, zones_file, visu=False):
+		covered = 0
 		try:
 			self.right_widget.radius = radius
 
 			satellites, covered = solve(self.file, N_sat, radius, grid_size, zones_file, visu)
 
 			self.right_widget.sat_pos = satellites
+			
+			try:
+				if threeD: self.right_widget.plot3D()
+				else: self.right_widget.plot2D()
+			except Exception as e:
+				popup_error("plotting error", e)
+			
+			popup_error(f"Covered population: {covered*100:.2f}%")
 		except Exception as e:
 			popup_error("Solver error", e)
-
-		try:
-			if threeD: self.right_widget.plot3D()
-			else: self.right_widget.plot2D()
-		except Exception as e:
-			popup_error("plotting error", e)
-		
-		popup_error(f"Covered population: {covered*100:.2f}%")

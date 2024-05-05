@@ -153,7 +153,7 @@ class NumWidget(QWidget):
 	def __init__(self, label, type=int, default=0):
 		super().__init__()
 
-		self.num = 0
+		self.num = default
 
 		self.type = type
 

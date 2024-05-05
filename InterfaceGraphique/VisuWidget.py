@@ -94,7 +94,8 @@ class Visuals(QWidget):
    
 		for lat, long in self.sat_pos:
 			x, y, z = coord_to_xyz(((lat, long),))[0]
-			self.plot.axes.plot(x, y, z, "*", color="red", markersize=10)
+			h = 1.2
+			self.plot.axes.plot(x*h, y*h, z*h, "*", color="red", markersize=10)
 			
 			# circle = matplotlib.patches.Circle((long, lat), self.radius, color='r', fill=False, linestyle="--", zorder=2)
 			# self.plot.axes.add_patch(circle)
