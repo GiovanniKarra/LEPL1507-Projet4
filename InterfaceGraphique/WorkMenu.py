@@ -14,6 +14,7 @@ from PyQt5.QtCore import (
 from VisuWidget import Visuals
 from ControlWidget import Controls
 from solver import solve, get_cities
+from utils import popup_error
 
 
 class WorkMenu(QWidget):
@@ -52,18 +53,24 @@ class WorkMenu(QWidget):
 			else: self.right_widget.plot2D()
 		except FileNotFoundError:
 			pass
-		except:
-			diag = QMessageBox()
-			diag.setText("File not compatible: %s"%filename)
-			diag.exec()
+		except Exception as e:
+			popup_error("File not compatible: %s"%filename, e)
 
 
 	def solve(self, N_sat, threeD, radius, grid_size, zones_file, visu=False):
-		self.right_widget.radius = radius
+		try:
+			self.right_widget.radius = radius
 
-		satellites, covered = solve(self.file, N_sat, radius, grid_size, zones_file, visu)
+			satellites, covered = solve(self.file, N_sat, radius, grid_size, zones_file, visu)
 
-		self.right_widget.sat_pos = satellites
+			self.right_widget.sat_pos = satellites
+		except Exception as e:
+			popup_error("Solver error", e)
 
-		if threeD: self.right_widget.plot3D()
-		else: self.right_widget.plot2D()
+		try:
+			if threeD: self.right_widget.plot3D()
+			else: self.right_widget.plot2D()
+		except Exception as e:
+			popup_error("plotting error", e)
+		
+		popup_error(f"Covered population: {covered*100:.2f}%")

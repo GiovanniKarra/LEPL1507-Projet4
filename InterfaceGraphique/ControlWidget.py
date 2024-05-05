@@ -44,11 +44,11 @@ class Controls(QWidget):
 		dim_selection.toggled_threeD.connect(self.toggled_threeD)
 		# dim_selection.setFixedWidth(120)
 
-		sat_num_selection = NumWidget("Number of satellites")
+		sat_num_selection = NumWidget("Number of satellites", default=30)
 
-		radius_selection = NumWidget("Satellite radius [km]", float)
+		radius_selection = NumWidget("Satellite radius [km]", type=float, default=200)
 
-		gridsize_selection = NumWidget("Grid size")
+		gridsize_selection = NumWidget("Grid size", default=10000)
 
 
 		show_names = CheckboxWidget("Show city names?")
@@ -150,7 +150,7 @@ class DimSelectionWidget(QWidget):
 
 
 class NumWidget(QWidget):
-	def __init__(self, label, type=int):
+	def __init__(self, label, type=int, default=0):
 		super().__init__()
 
 		self.num = 0
@@ -167,7 +167,7 @@ class NumWidget(QWidget):
 			num_field.setValidator(QIntValidator(0, 999999, self))
 		else:
 			num_field.setValidator(QDoubleValidator(0, 9999, 3, self))
-		num_field.setText("0")
+		num_field.setText(str(default))
 		num_field.textEdited.connect(self.set_num)
 		num_field.setFixedWidth(70)
 

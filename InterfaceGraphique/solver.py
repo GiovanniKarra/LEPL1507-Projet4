@@ -15,7 +15,9 @@ def solve(filename, N_sat, radius, grid_size, zones_file, visu=False):
 								  grid_size=grid_size, radius_acceptable=radius_acceptable,
 								  verbose=True, visualise=visu, zone=get_zones(zones_file))
 	
-	return sat_pos, sol
+	total_pop = np.sum(pd.read_csv(filename)["size"])
+
+	return sat_pos, sol/total_pop
 
 
 def get_zones(filename):
