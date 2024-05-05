@@ -19,12 +19,15 @@ def solve(filename, N_sat, radius, grid_size, zones_file, visu=False):
 
 
 def get_zones(filename):
-	data = pd.read_csv(filename)
-	N = len(data)
+	try:
+		data = pd.read_csv(filename)
+		N = len(data)
 
-	ret = list(data.itertuples(index=False, name=None))
+		ret = list(data.itertuples(index=False, name=None))
 
-	return ret
+		return ret
+	except:
+		return []
 
 
 def get_cities(filename):
