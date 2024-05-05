@@ -14,7 +14,7 @@ from scipy.optimize import minimize
 import visu_plot as visu
 
 
-def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2, radius_acceptable=0.200614975211322, verbose=False, visualise=False, zone=None):
+def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2, radius_acceptable=0.200614975211322, verbose=False, visualise=False, zone=None, nb_cities=None):
     """
     Calcule sur la sphère la répartition des satellites optimale pour obtenir une couverture de population maximale.
 
@@ -32,10 +32,15 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
     satellites_coordinates: coordonnées des satellites placés.
 	covered_population: population couverte
     """
-
+    time_start = time.time()
     data = pd.read_csv(file)
-    cities_weights = data["size"].to_numpy()
-    cities_coordinates = data[["lat", "long"]].to_numpy()
+    if nb_cities is not None:
+        temp = data.nlargest(nb_cities,["size"])
+        cities_weights = temp["size"].to_numpy()
+        cities_coordinates = temp[["lat", "long"]].to_numpy()
+    else:
+        cities_weights = data["size"].to_numpy()
+        cities_coordinates = data[["lat", "long"]].to_numpy()
 
     cities_xyz = add_func.cities_latlon_to_xyz(cities_coordinates)
 
@@ -43,7 +48,9 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
 
     # Pre-processing
     grid = pre.calc_grid_3d(grid_size, h)
-	
+    
+    preprocess_time = time.perf_counter() - t0
+ 
     # Check if 'zone iterdite' is not None
     if zone is not None: # zone = (lat_min, lat_max, long_min, long_max)
         for i in range(len(zone)):
@@ -65,8 +72,10 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
         print("Pre-processing terminé")
 
     # Solve problem
+    t1 = time.perf_counter()
     problem = models.basemodel(N_satellites, grid_size, cities_weights, matrix_adj)
     problem.solve(verbose=verbose, warm_start=True)
+    solve_disc_time = time.perf_counter() - t1
     if verbose:
         print("Problème résolu")
 
@@ -128,6 +137,7 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
     full_data_pd = pd.DataFrame(np.column_stack((cities_weights, lat,lon)), columns=["population", "latitude", "longitude"])
     full_data = full_data_pd.to_numpy()
 
+    t2 = time.perf_counter()
     for i in range(len(initial_guess)//2):
         if verbose:
             print("#"*20)
@@ -166,6 +176,8 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
             if add_func.distance(result.x[0], result.x[1], full_data[i][1], full_data[i][2]) <= R:
                 full_data[i][0] = 0
 
+    solve_continu_time = time.perf_counter() - t2
+    
     # Calcul de la couverture pour tous les satellites
     final_coverage = 0
     id_covered = []
@@ -190,7 +202,9 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
     if visualise:
         visu.plannar_2D_visu(cities_coordinates,tot_sat_coordsf,id_covered,zone=zone)
     
-    return tot_sat_coordsf, tot_sol, problem.value
+    tot_time = time.time() - time_start
+    
+    return tot_sat_coordsf, tot_sol, problem.value, preprocess_time, solve_disc_time, solve_continu_time, tot_time
 
 
 if __name__ == "__main__":
@@ -205,10 +219,10 @@ if __name__ == "__main__":
     ZI = [(0,50,105,150),(0,55,10,100)]
 
     t0 = time.perf_counter()
-    satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, 
-                                                                                #   grid_size=10000,
-                                                                                  verbose=True,
-                                                                                  visualise=True,
-                                                                                #   zone=ZI,
-                                                                                  )
+    garb = spherical_satellites_repartition(N_satellites, file, 
+                                            #   grid_size=10000,
+                                                verbose=True,
+                                                visualise=True,
+                                            #   zone=ZI,
+                                                )
     print("Time to solve:", time.perf_counter() - t0)   

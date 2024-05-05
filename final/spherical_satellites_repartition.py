@@ -198,7 +198,7 @@ def spherical_satellites_repartition(N_satellites, file, grid_size=10000, h=1.2,
 
 
 if __name__ == "__main__":
-    N_satellites = 100
+    N_satellites = 4
 
     file = "../test.csv"
     file = "../refactored_smol.csv"
@@ -210,7 +210,7 @@ if __name__ == "__main__":
 
     t0 = time.perf_counter()
     satellites_coordinates, covered_population = spherical_satellites_repartition(N_satellites, file, 
-                                                                                  grid_size=100,
+                                                                                  grid_size=1000,
                                                                                   verbose=True,
                                                                                   visualise=True,
                                                                                 #   zone=ZI,
