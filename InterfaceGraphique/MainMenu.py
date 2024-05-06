@@ -23,7 +23,7 @@ class MainMenu(QWidget):
 		
 		title = QLabel()
 		title.setText("<h1>Optimisateur d'emplacements de satellites</h1>")
-		title.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+		title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 		image_widget = QLabel()
 		# gif = QMovie("images/NewtonRaphson.gif")
@@ -31,21 +31,21 @@ class MainMenu(QWidget):
 		# gif.start()
 
 		image_widget.setPixmap(QPixmap("images/sat.png"))
-		# image_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		image_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 		start_button = QPushButton("Start")
-		# start_button.setFixedWidth(100)
+		start_button.setFixedWidth(150)
 		start_button.clicked.connect(self.start)
 
 		quit_button = QPushButton("Quit")
-		# quit_button.setFixedWidth(100)
+		quit_button.setFixedWidth(150)
 		quit_button.clicked.connect(self.quit)
 
 		layout = QVBoxLayout()
-		layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 		self.setLayout(layout)
 
 		layout.addWidget(title)
 		layout.addWidget(image_widget)
-		layout.addWidget(start_button)
-		layout.addWidget(quit_button)
+		layout.addWidget(start_button, alignment=Qt.AlignmentFlag.AlignCenter)
+		layout.addWidget(quit_button, alignment=Qt.AlignmentFlag.AlignCenter)
