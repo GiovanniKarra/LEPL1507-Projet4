@@ -2,7 +2,7 @@ from BENCH_spherical_satellites_repartition import *
 
 
 def sat_couv():
-    file = "../refactored_smol.csv"
+    file = "../new_data/refactored_smol.csv"
     data = pd.read_csv(file)
     tot_popu = data["size"].sum()
     sols_cont = []
@@ -23,11 +23,13 @@ def sat_couv():
     plt.title("Coverage as a function of the number of satellites")
     plt.xscale("log")
     plt.legend()
-    # plt.savefig("../images/sat_couv.pdf")
-    plt.show()
+    plt.savefig("../images/sat_couv2.pdf")
+    # plt.savefig("../images/sat_couv.png")
+    # plt.show()
+    plt.clf()
     
 def ray_couv():
-    file = "../refactored_smol.csv"
+    file = "../new_data/refactored_smol.csv"
     data = pd.read_csv(file)
     tot_popu = data["size"].sum()
     sols_cont = []
@@ -50,11 +52,13 @@ def ray_couv():
     plt.title("Coverage as a function of the acceptable radius")
     plt.xscale("log")
     plt.legend()
-    # plt.savefig("../images/ray_couv.pdf")
-    plt.show()
+    plt.savefig("../images/ray_couv2.pdf")
+    # plt.savefig("../images/ray_couv.png")
+    # plt.show()
+    plt.clf()
     
 def grid_couv():
-    file = "../refactored_smol.csv"
+    file = "../new_data/refactored_smol.csv"
     data = pd.read_csv(file)
     tot_popu = data["size"].sum()
     sols_cont = []
@@ -78,8 +82,10 @@ def grid_couv():
     plt.title("Coverage as a function of the size of the grid")
     plt.xscale("log")
     plt.legend()
-    # plt.savefig("../images/grid_couv.pdf")
-    plt.show()   
+    plt.savefig("../images/grid_couv2.pdf")
+    # plt.savefig("../images/grid_couv.png")
+    # plt.show()
+    plt.clf()   
     
     plt.plot(grid, delta, label="delta between continuous solver and discrete solver")
     plt.xlabel("Size of the grid")
@@ -87,11 +93,13 @@ def grid_couv():
     plt.title("Coverage as a function of the size of the grid")
     plt.xscale("log")
     plt.legend()
-    # plt.savefig("../images/grid_delta_couv.pdf")
-    plt.show()   
+    plt.savefig("../images/grid_delta_couv2.pdf")
+    # plt.savefig("../images/grid_delta_couv.png")
+    # plt.show()   
+    plt.clf() 
     
 def grid_time():
-    file = "../refactored_smol.csv"
+    file = "../new_data/refactored_smol.csv"
     time_cont = []
     time_disc = []
     time_pre = []
@@ -121,11 +129,13 @@ def grid_time():
     plt.yscale("log")
     plt.xscale("log")
     plt.legend()
-    # plt.savefig("../images/grid_time.pdf")
-    plt.show()
+    plt.savefig("../images/grid_time2.pdf")
+    # plt.savefig("../images/grid_time.png")
+    # plt.show()
+    plt.clf() 
     
 def sat_time():
-    file = "../refactored_smol.csv"
+    file = "../new_data/refactored_smol.csv"
     time_cont = []
     time_disc = []
     time_pre = []
@@ -155,11 +165,13 @@ def sat_time():
     plt.yscale("log")
     plt.xscale("log")
     plt.legend()
-    # plt.savefig("../images/sat_time.pdf")
-    plt.show()
+    plt.savefig("../images/sat_time2.pdf")
+    # plt.savefig("../images/sat_time.png")
+    # plt.show()
+    plt.clf() 
     
 def villes_time():
-    file = "../refactored_cleared.csv"
+    file = "../new_data/refactored_cleared.csv"
     time_cont = []
     time_disc = []
     time_pre = []
@@ -189,15 +201,17 @@ def villes_time():
     plt.yscale("log")
     plt.xscale("log")
     plt.legend()
-    # plt.savefig("../images/villes_time.pdf")
-    plt.show()
+    plt.savefig("../images/villes_time2.pdf")
+    # plt.savefig("../images/villes_time.png")
+    # plt.show()
+    plt.clf() 
     
 if __name__ == "__main__":
     t0 = time.perf_counter()
-    # sat_couv()
-    # ray_couv()
-    # grid_couv()
-    # grid_time()
-    # sat_time()  
-    # villes_time()
+    sat_couv()
+    ray_couv()
+    grid_couv()
+    grid_time()
+    sat_time()  
+    villes_time()
     print("Time to solve:", time.perf_counter() - t0)
