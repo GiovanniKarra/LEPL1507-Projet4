@@ -16,7 +16,7 @@ def objective_function(sat_coords, weights, R):
 
     for j in range(len(weights)):
         d = dst.distance((sat_coords[0], sat_coords[1]), (weights[j][1], weights[j][2])).km
-        total_coverage += poids[j] * (1/(1+np.exp((d-R))))
+        total_coverage += poids[j] * (1/(1+np.exp(100*(d-R))))
 
     return -total_coverage  # On veut maximiser la couverture
 
