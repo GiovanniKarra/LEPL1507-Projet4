@@ -97,3 +97,7 @@ ou
 ```Python
 satellites_coordinates, covered_population = euclidean_satellites_repartition(N_satellites, file, grid_size=1000, verbose=True, radius_acceptable_km=200)  
 ```
+
+## Interface graphique 
+
+L'interface graphique possède son propre README.md qu'il est conseillé de lire avant utilisation. 
