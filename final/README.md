@@ -22,7 +22,7 @@ ou
 ```Python
 if __name__ == "__main__":
     N_satellites = 10
-    # file = "../test.csv"
+    file = "../test.csv"
     satellites_coordinates, covered_population = euclidean_satellites_repartition(N_satellites, file)  
 ```
 
@@ -52,7 +52,7 @@ satellites_coordinates, covered_population = euclidean_satellites_repartition(N_
 
 ## Programme avec arguments additionnel:
 
-En sachant que les fonctions prennent en entrée le nombre de satellites à placer et un chemin vers un CSV contenant les informations sur les villes dans le bon format. Nous pouvons rajouter le reste des arguments, ceux-ci sont pré-initialisé a des valeurs cohérente physiquement parlant ou utile. Pour le détail de chaque argument la docstring des fonctions est toujours la pour vous aider. NB: si vous avez un rayon (R) en km, il est possible de retrouvé la valeur de "radius_acceptable" en fixant le "h" et ce grâce a cette conversion: ``radius_acceptable = sqrt((R/6371)^2+(h-1)^2)``
+En sachant que les fonctions prennent en entrée le nombre de satellites à placer et un chemin vers un CSV contenant les informations sur les villes dans le bon format. Nous pouvons rajouter le reste des arguments, ceux-ci sont pré-initialisé a des valeurs cohérente physiquement parlant ou utile. Pour le détail de chaque argument la docstring des fonctions est toujours la pour vous aider. NB: si vous avez un rayon (R) en km, il est possible de retrouver la valeur de "radius_acceptable" en fixant le "h" et ce grâce a cette conversion: ``radius_acceptable = sqrt((R/6371)^2+(h-1)^2)``
 
 De nouveau, il est possible de run nos fonction `spherical_satellites_repartition` et `euclidean_satellites_repartition` de deux façons differentes:
 
@@ -70,7 +70,7 @@ ou
 ```Python
 if __name__ == "__main__":
     N_satellites = 10
-    # file = "../test.csv"
+    file = "../test.csv"
     satellites_coordinates, covered_population = euclidean_satellites_repartition(N_satellites, file, grid_size=1000, verbose=True, radius_acceptable_km=200)  
 ```
 
